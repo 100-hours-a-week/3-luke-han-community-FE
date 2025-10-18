@@ -1,5 +1,5 @@
-import { login } from "../common/api";
-import { renderUserInput } from "../common/common";
+import { login } from "../common/api.js";
+import { renderUserInput } from "../common/common.js";
 
 const emailInput = document.querySelector('input[type="email"]');
 const passwordInput = document.querySelector('input[type="password"]');
@@ -46,6 +46,9 @@ submitButton.addEventListener('click', async () => {
       return;
     }
 
+    // TODO: 상태관리 처리(access token 저장 등)
+
+    // 로그인 성공 후 메인 페이지로 리다이렉트
     window.location.href = '/board';
   } catch {
     renderUserInput('.warning', '네트워크 오류가 발생했어요.');
