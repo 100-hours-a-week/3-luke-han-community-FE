@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아무 말 대잔치</title>
+</head>
+<body>
+  <header class="header">
+    <a href="/login"></a>
+    <h1 class="logo">아무 말 대잔치</h1>
+    <img class="profile" src="" alt="profile_image" />
+  </header>
+  <main class="main">
+    <h1 class="edit_title">게시글 수정</h1>
+    <h3 class="post_title">제목</h3>
+    <input type="text" class="title_input" />
+    <h3 class="post_content">내용</h3>
+    <textarea class="content_input"></textarea>
+    <div class="warning"></div>
+    <h3 class="post_image">이미지</h3>
+    <input type="file" class="image_input" />
+    <button class="submit_button"></button>
+  </main>
+</body>
+</html>
