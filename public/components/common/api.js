@@ -56,3 +56,34 @@ export async function getPosts(cursor = 0, size = 20) {
 
   return res;
 }
+
+/**
+ * 게시글 상세 조회
+ */
+export async function getPostDetail(postId) {
+  return fetch(`/api/posts/${postId}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * 댓글 생성
+ */
+export async function createComment(postId, comment) {
+  return fetch(`/api/post/${postId}/comments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ comment }),
+  });
+}
+
+/** 
+ * 댓글 목록 조회
+ */
+export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 } = {}) {
+  return fetch(`/api/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
