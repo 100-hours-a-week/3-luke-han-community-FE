@@ -5,8 +5,10 @@
  * @param {*} inputValue 
  * @returns 
  */
-function renderUserInput(targetSelector, inputValue) {
-  const target = document.querySelector(targetSelector);
+export function renderUserInput(targetOrSelector, inputValue) {
+  const target = typeof targetOrSelector === 'string'
+    ? document.querySelector(targetOrSelector)
+    : targetOrSelector;
   if (!target) return;
   target.textContent = inputValue;
 }

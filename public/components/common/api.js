@@ -37,3 +37,22 @@ export async function signup(url, body) {
 
   return res;
 };
+
+/**
+ * 게시글 목록 조회 API
+ * - cursor, size를 받아서 GET 요청
+ * 
+ * @param {number} cursor 
+ * @param {number} size 
+ * @returns {Promise<Response>}
+ */
+export async function getPosts(cursor = 0, size = 20) {
+  const res = await fetch(`/api/posts?cursor=${cursor}&size=${size}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return res;
+}
