@@ -87,3 +87,32 @@ export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 
     headers: { 'Content-Type': 'application/json' },
   });
 }
+
+/** 게시글 생성 */
+export async function createPost(body) {
+  return fetch(`/api/post`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+/** 게시글 수정 */
+export async function updatePost(postId, body) {
+  return fetch(`/api/post/${postId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+/** 
+ * S3 presigned URL 발급
+ * TODO: 향후 백엔드 presigned URL API와 맞춰서 수정 필요
+ */
+export async function getPresignedUrl(filename, contentType) {
+  return fetch(`/api/uploads/presign?filename=${encodeURIComponent(filename)}&contentType=${encodeURIComponent(contentType)}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
