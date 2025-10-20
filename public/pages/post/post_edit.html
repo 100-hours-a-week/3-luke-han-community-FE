@@ -1,26 +1,96 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap (개발 중 npm 방식) -->
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <title>아무 말 대잔치</title>
+  <style>
+    body { background:#f4f5f7; }
+  </style>
 </head>
-<body>
-  <header class="header">
-    <button class="back_button"></button>
-    <h1 class="logo">아무 말 대잔치</h1>
-    <img class="profile" src="" alt="profile_image" />
+<body class="text-dark">
+  <!-- Header: 절대배치 없이 Grid 3분할 -->
+  <header class="header border-bottom" style="background:#f4f5f7;">
+    <div class="container">
+      <div class="d-grid align-items-center py-3" style="grid-template-columns:auto 1fr auto; gap:.5rem;">
+        <!-- 좌: 뒤로가기 -->
+        <button type="button" class="back_button btn btn-link text-decoration-none py-0" onclick="history.back()">
+          &larr; <span class="d-none d-sm-inline">뒤로</span>
+        </button>
+
+        <!-- 중앙: 로고/타이틀 -->
+        <h1 class="logo m-0 fs-3 fw-semibold text-center text-truncate px-2">
+          아무 말 대잔치
+        </h1>
+
+        <!-- 우: 프로필 (동그랗게) -->
+        <img class="profile rounded-circle object-fit-cover" src=""
+             alt="profile_image" style="width:36px;height:36px;">
+      </div>
+    </div>
   </header>
+
+  <!-- Main -->
   <main class="main">
-    <h1 class="edit_title">게시글 수정</h1>
-    <h3 class="post_title">제목</h3>
-    <input type="text" class="title_input" />
-    <h3 class="post_content">내용</h3>
-    <textarea class="content_input"></textarea>
-    <div class="warning"></div>
-    <h3 class="post_image">이미지</h3>
-    <input type="file" class="image_input" />
-    <button class="submit_button"></button>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-7">
+          <!-- 페이지 타이틀 -->
+          <h1 class="edit_title h4 fw-bold text-center mb-4">게시글 수정</h1>
+
+          <!-- 카드형 폼 -->
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <!-- 제목 -->
+              <div class="mb-3">
+                <label class="post_title form-label" for="titleInput">제목</label>
+                <input id="titleInput" type="text"
+                       class="title_input form-control"
+                       placeholder="제목을 입력하세요" />
+              </div>
+
+              <!-- 내용 -->
+              <div class="mb-3">
+                <label class="post_content form-label" for="contentInput">내용</label>
+                <textarea id="contentInput"
+                          class="content_input form-control"
+                          rows="8"
+                          placeholder="내용을 입력하세요"></textarea>
+              </div>
+
+              <!-- 전역 경고 영역 -->
+              <div class="warning form-text text-danger mb-3" id="warn-global" hidden></div>
+
+              <!-- 이미지 업로드 -->
+              <div class="mb-4">
+                <label class="post_image form-label" for="imageInput">이미지</label>
+                <input id="imageInput" type="file"
+                       class="image_input form-control" accept="image/*" />
+              </div>
+
+              <!-- 제출 버튼 -->
+              <div class="d-grid">
+                <button type="button" class="submit_button btn btn-dark py-2">
+                  수정하기
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 보조 액션(선택) -->
+          <div class="d-flex justify-content-end mt-3">
+            <a href="/" class="link-dark fw-semibold">목록으로</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  <!-- JS (네 컴포넌트 스크립트가 있다면 연결) -->
+  <script src="/public/components/header/header.js"></script>
+  <script src="/public/components/post/edit.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,30 +1,77 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap (개발 중 npm 방식) -->
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <title>아무 말 대잔치</title>
+  <style>
+    body { background:#f4f5f7; }
+  </style>
 </head>
-<body>
-  <header class="header">
-    <h1 class="logo">아무 말 대잔치</h1>
-    <img class="profile" src="" alt="profile_image" />
+<body class="text-dark">
+  <!-- Header: absolute 제거, 그리드 3분할 -->
+  <header class="border-bottom" style="background:#f4f5f7;">
+    <div class="container">
+      <div class="d-grid align-items-center py-3" style="grid-template-columns:auto 1fr auto; gap:.5rem;">
+        <!-- 좌측: 뒤로가기(필요 없으면 a 태그 지워도 됨) -->
+        <a href="javascript:history.back()" class="btn btn-link text-decoration-none py-0">
+          &larr; <span class="d-none d-sm-inline">뒤로</span>
+        </a>
+
+        <!-- 중앙: 타이틀(정중앙 보장) -->
+        <h1 class="m-0 fs-3 fw-semibold text-center text-truncate px-2">
+          아무 말 대잔치
+        </h1>
+
+        <!-- 우측: 동그란 프로필 -->
+        <img src="" alt="profile_image"
+             class="rounded-circle object-fit-cover"
+             style="width:36px;height:36px;">
+      </div>
+    </div>
   </header>
-  <main class="main">
-    <h2>안녕하세요,</h2>
-    <br />
-    <h2>아무 말 대잔치 <b>게시판</b> 입니다.</h2>
-    <button class="create">게시글 작성</button>
-    <div class="post">
-      <h2><b class="post_title"></b></h2>
-      <span class="counts"></span>
-      <span class="counts"></span>
-      <span class="counts"></span>
-      <span class="created_time"></span>
-      <br />
-      <img class="profile" src="" alt="profile_image" />
-      <span class="nickname"></span>
+
+  <!-- Main -->
+  <main>
+    <div class="container py-5">
+      <div class="mb-4 text-center">
+        <h2 class="h4 mb-1">안녕하세요,</h2>
+        <h2 class="h4">아무 말 대잔치 <strong>게시판</strong> 입니다.</h2>
+      </div>
+
+      <!-- 작성 버튼 -->
+      <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-dark create">게시글 작성</button>
+      </div>
+
+      <!-- 게시글 카드 (예시 1개) -->
+      <div class="card shadow-sm mb-3 post">
+        <div class="card-body">
+          <h3 class="h5 mb-2"><strong class="post_title">제목</strong></h3>
+
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+            <span class="counts badge text-bg-secondary">조회 0</span>
+            <span class="counts badge text-bg-secondary">댓글 0</span>
+            <span class="counts badge text-bg-secondary">좋아요 0</span>
+            <small class="created_time text-muted ms-auto">방금 전</small>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <img class="profile rounded-circle object-fit-cover" src=""
+                 alt="profile_image" style="width:36px;height:36px;">
+            <span class="nickname fw-medium">닉네임</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
+
+  <script src="/public/components/header/header.js"></script>
+  <script src="/public/components/home/home.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
