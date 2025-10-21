@@ -5,7 +5,7 @@
  * @param {*} inputValue 
  * @returns 
  */
-export function renderUserInput(targetOrSelector, inputValue) {
+function renderUserInput(targetOrSelector, inputValue) {
   const target = typeof targetOrSelector === 'string'
     ? document.querySelector(targetOrSelector)
     : targetOrSelector;

@@ -46,7 +46,7 @@ submitButton.addEventListener('click', async () => {
       return;
     }
 
-    // TODO: 상태관리 처리(access token 저장 등)
+    localStorage.setItem('accessToken', res.headers.get('Authorization') || '');
 
     // 로그인 성공 후 메인 페이지로 리다이렉트
     window.location.href = '/board';
