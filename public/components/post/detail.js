@@ -22,7 +22,8 @@ const commentInput = document.querySelector('.comment_input');
 const commentSubmitBtn = document.querySelector('.comment_button');
 
 // 댓글 템플릿/컨테이너
-const commentTemplate = document.querySelector('.comments_section');
+const commentsContainer = document.querySelector('.comments_section');
+const commentTemplate = commentsContainer?.firstElementChild || null;
 const commentsParent = commentTemplate?.parentElement;
 if (commentTemplate) commentTemplate.style.display = 'none';
 
@@ -46,6 +47,10 @@ function updateLikeButton() {
 
 function renderEmptyComment() {
   if (!commentsParent) return;
+
+  const existed = commentsContainer.querySelector('.empty-state');
+  if (existed) return;
+
   const empty = document.createElement('div');
   empty.className = 'empty-state text-center text-muted py-3';
   empty.innerHTML = `
@@ -56,14 +61,8 @@ function renderEmptyComment() {
   commentsParent.appendChild(empty);
 }
 
-// 댓글 카드 렌더 (CommentDto)
-function renderCommentItem(item) {
+function renderOneComment(element) {
   if (!commentTemplate || !commentsParent) return;
-
-  if (!item) {
-    renderCommentItem();
-    return;
-  }
 
   const node = commentTemplate.cloneNode(true);
   node.style.display = '';
@@ -74,12 +73,12 @@ function renderCommentItem(item) {
   const time = ui?.querySelector('.created_time');
   const content = ui?.querySelector('.comment_content');
 
-  if (img && item?.profileImageUrl) img.src = item.profileImageUrl;
-  if (nick) nick.textContent = item?.name ?? '';
-  if (time) time.textContent = item?.createdAt ?? '';
-  if (content) content.textContent = item?.comment ?? '';
+  if (img && element?.profileImageUrl) img.src = element.profileImageUrl;
+  if (nick) nick.textContent = element?.name ?? '';
+  if (time) time.textContent = element?.createdAt ?? '';
+  if (content) content.textContent = element?.comment ?? '';
 
-  // TODO: 본인만 수정/삭제 보이게 (me.id === item.userId)
+  // TODO: 본인만 수정/삭제 보이게 (me.id === element.userId)
   const edit = node.querySelector('.edit_button');
   const del = node.querySelector('.delete_button');
   if (edit) edit.style.display = 'none';
@@ -88,8 +87,29 @@ function renderCommentItem(item) {
   commentsParent.appendChild(node);
 }
 
+// 댓글 카드 렌더 (CommentDto)
+function renderCommentItem(item) {
+  console.log('item: ', item);
+  if (!commentsContainer) return;
+
+  const arr = Array.isArray(item) ? item : [];
+
+  const existedEmpty = commentsContainer.querySelector('.empty-state');
+  if (existedEmpty) existedEmpty.remove();
+
+  if (arr.length === 0) {
+    renderEmptyComment();
+    return;
+  }
+
+  arr.forEach((element) => {
+    renderOneComment(element);
+  });
+}
+
 // 상세 렌더 (PostDetailWrapper: { author, post, comments })
 function renderDetail(wrapper) {
+  console.log('renderDetail 호출:', wrapper);
   const author = wrapper?.author || {};
   const post = wrapper?.post || {};
   const comments = Array.isArray(wrapper?.comments) ? wrapper.comments : [];
@@ -118,7 +138,7 @@ function renderDetail(wrapper) {
   if (deleteBtn) deleteBtn.style.display = 'none';
 
   // 댓글 렌더
-  comments.forEach(renderCommentItem);
+  renderCommentItem(comments);
 }
 
 // 댓글 등록
