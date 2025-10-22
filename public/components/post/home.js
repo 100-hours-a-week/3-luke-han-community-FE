@@ -31,8 +31,11 @@ function renderEmpty() {
 
 // 게시글 목록 하나(템플릿 용) 렌더링
 function renderPost(wrapper) {
+  console.log('renderPost 호출');
   const post = wrapper?.post ?? {};
   const author = wrapper?.author ?? {};
+  console.log('렌더링 게시글:', post);
+  console.log('작성자:', author);
 
   const node = postTemplate.cloneNode(true);
   node.style.display = '';
@@ -90,10 +93,13 @@ async function loadPosts(cursor = nextCursor, size = 10) {
     }
 
     const data = await res.json();
+    console.log("게시글 목록 데이터:", data);
+    console.log("data.post:", data.list);
 
-    const list = Array.isArray(data.posts) ? data.posts : [];
+    const list = Array.isArray(data.list) ? data.list : [];
     nextCursor = data?.nextCursor ?? null;
     hasNextCursor = Boolean(data?.hasNextCursor);
+    console.log(list);
 
     list.forEach(post => renderPost(post));
   } catch (e) {

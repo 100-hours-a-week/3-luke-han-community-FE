@@ -1,4 +1,4 @@
-import { getPostDetail, createComment /*, getComments */ } from "../common/api.js";
+import { getPostDetail, createComment } from "../common/api.js";
 
 // 상세 영역
 const titleEl = document.querySelector('.post_title');
@@ -34,6 +34,7 @@ function getPostId() {
   return null;
 }
 const POST_ID = getPostId();
+console.log('POST_ID:', POST_ID);
 
 // 프론트 임시 좋아요 상태(백엔드 붙으면 제거)
 let liked = false;
@@ -43,9 +44,27 @@ function updateLikeButton() {
   likeBtn.textContent = liked ? '좋아요 취소' : '좋아요';
 }
 
+function renderEmptyComment() {
+  if (!commentsParent) return;
+  const empty = document.createElement('div');
+  empty.className = 'empty-state text-center text-muted py-3';
+  empty.innerHTML = `
+    <div class="d-inline-block">
+      <div class="mb-2">댓글이 없습니다.</div>
+      <div class="small">첫 글을 작성해 보세요!</div>
+    </div>`;
+  commentsParent.appendChild(empty);
+}
+
 // 댓글 카드 렌더 (CommentDto)
 function renderCommentItem(item) {
   if (!commentTemplate || !commentsParent) return;
+
+  if (!item) {
+    renderCommentItem();
+    return;
+  }
+
   const node = commentTemplate.cloneNode(true);
   node.style.display = '';
 
@@ -136,14 +155,19 @@ likeBtn?.addEventListener('click', toggleLike);
 commentSubmitBtn?.addEventListener('click', submitComment);
 
 // 초기 로드
-(async function init() {
+async function init() {
   if (!POST_ID) return;
   try {
+    console.log('게시글 상세 조회:', POST_ID);
     const res = await getPostDetail(POST_ID);
+    console.log('상세 조회 응답:', res);
     if (!res.ok) return;
     const data = await res.json(); // PostDetailWrapper
+    console.log('상세 조회 데이터:', data);
     renderDetail(data);
   } catch (e) {
     console.error('상세 조회 실패', e);
   }
-})();
+};
+
+init();
