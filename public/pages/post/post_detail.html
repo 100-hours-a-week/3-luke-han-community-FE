@@ -27,8 +27,8 @@
           <span class="created_time text-muted small">방금 전</span>
 
           <div class="ms-auto d-flex gap-2">
-            <button class="edit_button btn btn-outline-secondary btn-sm">수정</button>
-            <button class="delete_button btn btn-outline-danger btn-sm">삭제</button>
+            <button class="edit_button btn btn-outline-secondary btn-sm invisible">수정</button>
+            <button class="delete_button btn btn-outline-danger btn-sm invisible">삭제</button>
           </div>
         </div>
       </div>
@@ -36,9 +36,7 @@
       <!-- 본문: 이미지 + 내용 + 카운트/좋아요 -->
       <div class="content">
         <!-- 이미지(여러 장일 경우 캐러셀로 바꿔도 됨) -->
-        <div class="mb-3">
-          <img class="post_image img-fluid rounded" src="" alt="post_image">
-        </div>
+        <div class="post_images row g-2"></div>
 
         <!-- 본문 내용 -->
         <div class="card shadow-sm mb-3">

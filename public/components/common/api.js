@@ -9,12 +9,13 @@ const API_BASE_URL = 'http://localhost:8080';
  * @returns 
  */
 export async function login(body) {
-  const res = await fetch(API_BASE_URL, `/api/auth/signin`, {
+  const res = await fetch(API_BASE_URL + `/api/auth/signin`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
-    body: JSON.stringify(body),
+    body: body,
+    credentials: 'include',
   });
 
   return res;
@@ -29,12 +30,13 @@ export async function login(body) {
  * @returns 
  */
 export async function signup(body) {
-  const res = await fetch(API_BASE_URL, `/api/auth/signup`, {
+  const res = await fetch(API_BASE_URL + `/api/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    credentials: 'include',
   });
 
   return res;
@@ -55,6 +57,7 @@ export async function getPosts(cursor = 0, size = 20) {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
+    credentials: 'include',
   });
 
   return res;
@@ -70,6 +73,7 @@ export async function getPostDetail(postId) {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
+    credentials: 'include',
   });
 }
 
@@ -77,13 +81,14 @@ export async function getPostDetail(postId) {
  * 댓글 생성
  */
 export async function createComment(postId, comment) {
-  return fetch(API_BASE_URL + `/api/post/${postId}/comments`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify({ comment }),
+    credentials: 'include',
   });
 }
 
@@ -97,43 +102,50 @@ export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
+    credentials: 'include',
   });
 }
 
 /** 게시글 생성 */
 export async function createPost(body) {
-  return fetch(API_BASE_URL + `/api/post`, {
+  return fetch(API_BASE_URL + `/api/posts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body: JSON.stringify(body),
+    body,
+    credentials: 'include',
   });
 }
 
 /** 게시글 수정 */
 export async function updatePost(postId, body) {
-  return fetch(API_BASE_URL + `/api/post/${postId}`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body: JSON.stringify(body),
+    body: body,
+    credentials: 'include',
   });
 }
 
-/** 
- * S3 presigned URL 발급
- * TODO: 향후 백엔드 presigned URL API와 맞춰서 수정 필요
- */
-export async function getPresignedUrl(filename, contentType) {
-  return fetch(API_BASE_URL + `/api/uploads/presign?filename=${encodeURIComponent(filename)}&contentType=${encodeURIComponent(contentType)}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
-    },
+export async function uploadToS3(url, file) {
+  const headers = { 'Content-Type': file.type || 'application/octet-stream' };
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers,
+    body: file,
+    credentials: 'include',
   });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`S3 업로드 실패: ${res.status} ${text}`);
+  }
+
+  return res;
 }

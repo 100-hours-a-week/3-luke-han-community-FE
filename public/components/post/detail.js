@@ -10,7 +10,7 @@ const createdTimeEl = authorBox?.querySelector('.created_time');
 const editBtn = document.querySelector('.title .edit_button');
 const deleteBtn = document.querySelector('.title .delete_button');
 
-const postImage = document.querySelector('.post_image');     // 단일 이미지 슬롯(여러 장이면 첫 장만 표시)
+const imagesWrap = document.querySelector('.post_images');
 const postContent = document.querySelector('.post_content');
 
 const likeBtn = document.querySelector('.like_button');      // TODO: 백엔드 좋아요 붙이면 교체
@@ -107,6 +107,23 @@ function renderCommentItem(item) {
   });
 }
 
+function renderImages(urls = []) {
+  if (!imagesWrap) return;
+  imagesWrap.innerHTML = '';
+
+  urls.forEach((url) => {
+    if (!url) return;
+    const col = document.createElement('div');
+    col.className = 'col-12';
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'post_image';
+    img.className = 'img-fluid';
+    col.appendChild(img);
+    imagesWrap.appendChild(col);
+  });
+}
+
 // 상세 렌더 (PostDetailWrapper: { author, post, comments })
 function renderDetail(wrapper) {
   console.log('renderDetail 호출:', wrapper);
@@ -116,13 +133,16 @@ function renderDetail(wrapper) {
 
   // 제목/작성자/시간
   if (titleEl) titleEl.textContent = post.title ?? '';
-  if (authorImg && author.profileImageUrl) authorImg.src = author.profileImageUrl;
+  if (authorImg) authorImg.src = author.profileImageUrl || '/assets/image/default_profile.png';
   if (authorNameEl) authorNameEl.textContent = author.name ?? '';
   if (createdTimeEl) createdTimeEl.textContent = post.createdAt ?? '';
 
   // 이미지(여러 장 중 첫 장만 표시 — HTML이 단일 슬롯이므로)
-  const firstImage = Array.isArray(post.images) && post.images.length > 0 ? post.images[0] : null;
+  const images = Array.isArray(post.images) ? post.images : [];
+  const firstImage = images[0] || null;
   if (postImage && firstImage) postImage.src = firstImage;
+
+  renderImages(images);
 
   // 본문/카운트
   if (postContent) postContent.textContent = post.content ?? '';
@@ -134,8 +154,8 @@ function renderDetail(wrapper) {
   updateLikeButton();
 
   // TODO: 본인일 때만 수정/삭제 보이기 (me.id === author.id)
-  if (editBtn) editBtn.style.display = 'none';
-  if (deleteBtn) deleteBtn.style.display = 'none';
+  if (editBtn) editBtn.classList.remove('invisible');
+  if (deleteBtn) deleteBtn.classList.remove('invisible');
 
   // 댓글 렌더
   renderCommentItem(comments);
@@ -173,6 +193,12 @@ function toggleLike() {
 
 likeBtn?.addEventListener('click', toggleLike);
 commentSubmitBtn?.addEventListener('click', submitComment);
+editBtn?.addEventListener('click', () => {
+  if (!POST_ID) return;
+  console.log('수정 버튼 클릭, POST_ID:', POST_ID);
+  window.location.href = `/post/${POST_ID}/edit`;
+});
+// TODO: 삭제 모달 띄우기
 
 // 초기 로드
 async function init() {

@@ -56,7 +56,7 @@ function renderPost(wrapper) {
   if (nickEl) nickEl.textContent = author.name ?? '';
 
   const profEl = node.querySelector('img.profile');
-  if (profEl && author.profileImageUrl) profEl.src = author.profileImageUrl;
+  if (profEl) profEl.src = author.profileImageUrl || '/assets/image/default_profile.png';
 
   node.addEventListener('click', () => {
     const id = node.dataset.postId;

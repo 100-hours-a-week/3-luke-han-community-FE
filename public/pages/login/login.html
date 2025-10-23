@@ -7,12 +7,8 @@
   <title>아무 말 대잔치</title>
 </head>
 <body class="text-dark" style="background:#f4f5f7;">
-  <!-- Header -->
-  <header class="border-bottom py-3" style="background:#f4f5f7;">
-    <div class="container d-flex justify-content-center">
-      <h1 class="m-0 fs-3 fw-semibold text-xl">아무 말 대잔치</h1>
-    </div>
-  </header>
+  <!-- Header: absolute 제거, 그리드 3분할 -->
+  <header id="header-component"></header>
 
   <!-- Main -->
   <main>
@@ -49,7 +45,7 @@
               <div id="form-warning" class="form-text text-danger mb-3" hidden></div>
 
               <!-- 제출 버튼 -->
-              <button type="submit" class="btn btn-dark w-100 py-2">
+              <button type="submit" class="submit_button btn btn-dark w-100 py-2">
                 로그인
               </button>
 
@@ -66,8 +62,8 @@
     </div>
   </main>
 
-  <script src="/public/components/header/header.js"></script>
-  <script src="/public/components/login/login.js"></script>
+  <script src="/../../components/header/header.js"></script>
+  <script type="module" src="/../../components/login/login.js"></script>
   <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
