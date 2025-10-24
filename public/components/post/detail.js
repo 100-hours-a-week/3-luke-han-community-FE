@@ -13,8 +13,9 @@ const deleteBtn = document.querySelector('.title .delete_button');
 const imagesWrap = document.querySelector('.post_images');
 const postContent = document.querySelector('.post_content');
 
-const likeBtn = document.querySelector('.like_button');      // TODO: 백엔드 좋아요 붙이면 교체
+const likeBox = document.querySelector('.like_box');
 const likeCountEl = document.querySelector('.like_count');
+const viewCountEl = document.querySelector('.view_count');
 const commentCountEl = document.querySelector('.comment_count');
 
 // 댓글 입력
@@ -36,14 +37,6 @@ function getPostId() {
 }
 const POST_ID = getPostId();
 console.log('POST_ID:', POST_ID);
-
-// 프론트 임시 좋아요 상태(백엔드 붙으면 제거)
-let liked = false;
-
-function updateLikeButton() {
-  if (!likeBtn) return;
-  likeBtn.textContent = liked ? '좋아요 취소' : '좋아요';
-}
 
 function renderEmptyComment() {
   if (!commentsParent) return;
@@ -137,21 +130,24 @@ function renderDetail(wrapper) {
   if (authorNameEl) authorNameEl.textContent = author.name ?? '';
   if (createdTimeEl) createdTimeEl.textContent = post.createdAt ?? '';
 
-  // 이미지(여러 장 중 첫 장만 표시 — HTML이 단일 슬롯이므로)
   const images = Array.isArray(post.images) ? post.images : [];
-  const firstImage = images[0] || null;
-  if (postImage && firstImage) postImage.src = firstImage;
-
   renderImages(images);
 
+  console.log('post:', post);
   // 본문/카운트
   if (postContent) postContent.textContent = post.content ?? '';
-  if (likeCountEl) likeCountEl.textContent = String(post.likeCount ?? 0);
-  if (commentCountEl) commentCountEl.textContent = String(post.commentCount ?? 0);
+
+  const likeCount = Number(post.likeCount ?? 0);
+  const viewCount = Number(post.viewCount ?? 0);
+  const commentCount = Number(post.commentCount ?? 0);
+
+  if (likeCountEl) likeCountEl.textContent = String(likeCount);
+  if (viewCountEl) viewCountEl.textContent = String(viewCount);
+  if (commentCountEl) commentCountEl.textContent = String(commentCount);
 
   // TODO: liked 여부를 백엔드에서 내려준다면 여기에 반영 (지금은 없으니 false 유지)
   liked = false;
-  updateLikeButton();
+  toggleLike();
 
   // TODO: 본인일 때만 수정/삭제 보이기 (me.id === author.id)
   if (editBtn) editBtn.classList.remove('invisible');
@@ -180,24 +176,27 @@ async function submitComment() {
   }
 }
 
-// 좋아요 토글 (프론트 임시)
+let liked = false;
+
 function toggleLike() {
+  if (!likeCountEl) return;
+
+  let n = parseInt(likeCountEl.textContent || '0', 10);
+  n = isNaN(n) ? 0 : n;
+
   liked = !liked;
-  updateLikeButton();
-  if (likeCountEl) {
-    let n = parseInt(likeCountEl.textContent || '0', 10);
-    n = isNaN(n) ? 0 : n + (liked ? 1 : -1);
-    likeCountEl.textContent = String(Math.max(0, n));
-  }
+  n = Math.max(0, n + (liked ? 1 : -1));
+
+  likeCountEl.textContent = String(n);
 }
 
-likeBtn?.addEventListener('click', toggleLike);
+// 이벤트 바인딩
+likeBox?.addEventListener('click', toggleLike);
+
+// 댓글 등록 버튼
 commentSubmitBtn?.addEventListener('click', submitComment);
-editBtn?.addEventListener('click', () => {
-  if (!POST_ID) return;
-  console.log('수정 버튼 클릭, POST_ID:', POST_ID);
-  window.location.href = `/post/${POST_ID}/edit`;
-});
+
+
 // TODO: 삭제 모달 띄우기
 
 // 초기 로드

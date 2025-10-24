@@ -96,7 +96,7 @@ export async function createComment(postId, comment) {
  * 댓글 목록 조회
  */
 export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 } = {}) {
-  return fetch(API_BASE_URL + `/api/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -139,7 +139,6 @@ export async function uploadToS3(url, file) {
     method: 'PUT',
     headers,
     body: file,
-    credentials: 'include',
   });
 
   if (!res.ok) {

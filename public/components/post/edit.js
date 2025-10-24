@@ -5,7 +5,7 @@ const logo = document.querySelector('.logo');
 const backButton = document.querySelector('.back_button');
 const titleInput = document.querySelector('.title_input');
 const contentInput = document.querySelector('.content_input');
-const imageInput = document.querySelector('.image_input'); // TODO: S3 presigned 업로드
+const imageInput = document.getElementById('imageInput');
 const submitButton = document.querySelector('.submit_button');
 const warningEl = document.querySelector('.warning');
 const pageTitleEl = document.querySelector('.edit_title');
@@ -66,17 +66,19 @@ submitButton?.addEventListener('click', async () => {
   }
   setWarning('');
 
-  // TODO: S3 presigned 업로드 -> 업로드 성공 시 images 배열 채우기
-  // 지금은 과제 최소 구현으로 빈 배열 전송
+  // 이미지 파일명 목록 추출
   const files = imageInput?.files ? Array.from(imageInput.files) : [];
   const images = files.map(f => f.name);
+  console.log('업로드할 이미지 파일들:', images);
 
   const body = JSON.stringify({ title, content, images });
+  console.log('전송 바디:', body);
 
   try {
     let res;
     if (mode === 'create') {
       res = await createPost(body);
+      console.log('게시글 생성 응답:', res);
     } else {
       res = await updatePost(POST_ID, body);
     }
@@ -117,7 +119,7 @@ submitButton?.addEventListener('click', async () => {
         }
       }
 
-      window.location.href = '/';
+      // window.location.href = `/post/${POST_ID}`;
     } else {
       window.location.href = `/post/${POST_ID}`;
     }
