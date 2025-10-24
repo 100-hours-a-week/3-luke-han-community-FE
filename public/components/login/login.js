@@ -4,6 +4,7 @@ import { renderUserInput } from "../common/common.js";
 const emailInput = document.querySelector('input[type="email"]');
 const passwordInput = document.querySelector('input[type="password"]');
 const submitButton = document.querySelector('.submit_button');
+const warningEl = document.getElementById('form-warning');
 
 /**
  * 입력값에 대해 경고문구 렌더링 처리 함수
@@ -12,7 +13,7 @@ function validateInputs() {
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   renderUserInput(
-    '.warning',
+    warningEl,
     email === '' || password === '' ? '모든 필드를 채워주세요.' : ''
   );
 }
@@ -23,15 +24,18 @@ passwordInput.addEventListener('input', validateInputs);
 submitButton.addEventListener('click', async () => {
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
+  const form = new URLSearchParams();
+  form.append('username', email);
+  form.append('password', password);
 
   if (!email || !password) {
-    renderUserInput('.warning', '모든 필드를 채워주세요.');
+    renderUserInput(warningEl, '모든 필드를 채워주세요.');
     return;
   }
-  renderUserInput('.warning', '');
+  renderUserInput(warningEl, '');
 
   try {
-    const res = await login('/api/auth/signin', { email, password });
+    const res = await login(form.toString());
 
     if (!res.ok) {
       let msg = '로그인 실패';
@@ -42,15 +46,18 @@ submitButton.addEventListener('click', async () => {
         const text = await res.text();
         if (text) msg = text;
       }
-      renderUserInput('.warning', '아이디 혹은 비밀번호가 다릅니다.');
+      renderUserInput(warningEl, '아이디 혹은 비밀번호가 다릅니다.');
       return;
     }
 
-    // TODO: 상태관리 처리(access token 저장 등)
+    localStorage.setItem('accessToken', res.headers.get('Authorization') || '');
+    const data = await res.json();
+    localStorage.setItem('profile_image', data.profileImageUrl || '');
+    localStorage.setItem('user_id', data.userId || '');
 
     // 로그인 성공 후 메인 페이지로 리다이렉트
-    window.location.href = '/board';
+    window.location.href = '/';
   } catch {
-    renderUserInput('.warning', '네트워크 오류가 발생했어요.');
+    renderUserInput(warningEl, '네트워크 오류가 발생했어요.');
   }
 });

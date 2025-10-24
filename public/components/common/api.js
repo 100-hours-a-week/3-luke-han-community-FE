@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://localhost:8080';
+
 /**
  * 로그인 API
  * - url과 body를 받아서 fetch 요청을 보냄
@@ -6,13 +8,14 @@
  * @param {*} body 
  * @returns 
  */
-export async function login(url, body) {
-  const res = await fetch(url, {
+export async function login(body) {
+  const res = await fetch(API_BASE_URL + `/api/auth/signin`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
-    body: JSON.stringify(body),
+    body: body,
+    credentials: 'include',
   });
 
   return res;
@@ -26,13 +29,14 @@ export async function login(url, body) {
  * @param {*} body 
  * @returns 
  */
-export async function signup(url, body) {
-  const res = await fetch(url, {
+export async function signup(body) {
+  const res = await fetch(API_BASE_URL + `/api/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    credentials: 'include',
   });
 
   return res;
@@ -47,11 +51,13 @@ export async function signup(url, body) {
  * @returns {Promise<Response>}
  */
 export async function getPosts(cursor = 0, size = 20) {
-  const res = await fetch(`/api/posts?cursor=${cursor}&size=${size}`, {
+  const res = await fetch(API_BASE_URL + `/api/posts?cursor=${cursor}&size=${size}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
     },
+    credentials: 'include',
   });
 
   return res;
@@ -61,9 +67,13 @@ export async function getPosts(cursor = 0, size = 20) {
  * 게시글 상세 조회
  */
 export async function getPostDetail(postId) {
-  return fetch(`/api/posts/${postId}`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    credentials: 'include',
   });
 }
 
@@ -71,10 +81,14 @@ export async function getPostDetail(postId) {
  * 댓글 생성
  */
 export async function createComment(postId, comment) {
-  return fetch(`/api/post/${postId}/comments`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/comments`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
     body: JSON.stringify({ comment }),
+    credentials: 'include',
   });
 }
 
@@ -82,37 +96,55 @@ export async function createComment(postId, comment) {
  * 댓글 목록 조회
  */
 export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 } = {}) {
-  return fetch(`/api/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
     method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    credentials: 'include',
   });
 }
 
 /** 게시글 생성 */
 export async function createPost(body) {
-  return fetch(`/api/post`, {
+  return fetch(API_BASE_URL + `/api/posts`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    body,
+    credentials: 'include',
   });
 }
 
 /** 게시글 수정 */
 export async function updatePost(postId, body) {
-  return fetch(`/api/post/${postId}`, {
+  return fetch(API_BASE_URL + `/api/posts/${postId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    body: body,
+    credentials: 'include',
   });
 }
 
-/** 
- * S3 presigned URL 발급
- * TODO: 향후 백엔드 presigned URL API와 맞춰서 수정 필요
- */
-export async function getPresignedUrl(filename, contentType) {
-  return fetch(`/api/uploads/presign?filename=${encodeURIComponent(filename)}&contentType=${encodeURIComponent(contentType)}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+export async function uploadToS3(url, file) {
+  const headers = { 'Content-Type': file.type || 'application/octet-stream' };
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers,
+    body: file,
   });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`S3 업로드 실패: ${res.status} ${text}`);
+  }
+
+  return res;
 }

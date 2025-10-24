@@ -5,12 +5,17 @@
  * @param {*} inputValue 
  * @returns 
  */
-export function renderUserInput(targetOrSelector, inputValue) {
+function renderUserInput(targetOrSelector, inputValue, opts = {}) {
   const target = typeof targetOrSelector === 'string'
     ? document.querySelector(targetOrSelector)
     : targetOrSelector;
   if (!target) return;
+
   target.textContent = inputValue;
+
+  if (opts.autoHide) {
+    target.hidden = !inputValue;
+  }
 }
 
 export { renderUserInput };

@@ -1,22 +1,69 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <title>아무 말 대잔치</title>
 </head>
-<body>
-  <header class="header">
-    <h1 class="logo">아무 말 대잔치</h1>
-  </header>
-  <main class="main">
-    <h1>로그인</h1>
-    <h3>이메일</h3>
-    <input type="email" class="input_element" placeholder="이메일을 입력하세요">
-    <h3>비밀번호</h3>
-    <input type="password" class="input_element" placeholder="비밀번호를 입력하세요">
-    <div class="warning"></div>
-    <button class="submit_button">로그인</button>
+<body class="text-dark" style="background:#f4f5f7;">
+  <!-- Header: absolute 제거, 그리드 3분할 -->
+  <header id="header-component"></header>
+
+  <!-- Main -->
+  <main>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+          <h1 class="h4 fw-bold text-center mb-4">로그인</h1>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <!-- 이메일 -->
+              <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <input
+                  id="email"
+                  type="email"
+                  class="form-control"
+                  placeholder="이메일을 입력하세요"
+                />
+              </div>
+
+              <!-- 비밀번호 -->
+              <div class="mb-1">
+                <label for="password" class="form-label">비밀번호</label>
+                <input
+                  id="password"
+                  type="password"
+                  class="form-control"
+                  placeholder="비밀번호를 입력하세요"
+                />
+              </div>
+
+              <!-- 경고/에러 메시지 영역 -->
+              <div id="form-warning" class="form-text text-danger mb-3" hidden></div>
+
+              <!-- 제출 버튼 -->
+              <button type="submit" class="submit_button btn btn-dark w-100 py-2">
+                로그인
+              </button>
+
+              <!-- 보조 액션 -->
+              <div class="d-flex justify-content-between align-items-center mt-3 small">
+                <a href="/forgot" class="link-secondary text-decoration-underline">비밀번호 찾기</a>
+                <a href="/signup" class="link-dark fw-semibold">회원가입</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </main>
+
+  <script src="/../../components/header/header.js"></script>
+  <script type="module" src="/../../components/login/login.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,53 +1,111 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap (개발 중 npm 방식) -->
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
   <title>아무 말 대잔치</title>
+  <style>
+    body { background:#f4f5f7; }
+  </style>
 </head>
-<body>
-  <header class="header">
-    <button class="back_button"></button>
-    <h1 class="logo">아무 말 대잔치</h1>
-    <img class="profile" src="" alt="profile_image" />
-  </header>
+<body class="text-dark">
+  <!-- Header: absolute 제거, 그리드 3분할 -->
+  <header id="header-component"></header>
+
+  <!-- Main -->
   <main class="main">
-    <div class="title">
-      <h1 class="post_title"></h1>
-      <div class="user_info">
-        <img class="profile" src="" alt="profile_image" />
-        <span class="nickname"></span>
-        <span class="created_time"></span>
-        <button class="edit_button">수정</button>
-        <button class="delete_button">삭제</button>
+    <div class="container py-5">
+      <!-- 게시글 상단: 제목 + 작성자 정보 -->
+      <div class="title mb-4">
+        <h1 class="post_title h3 fw-bold mb-3">제목 로딩 중...</h1>
+
+        <div class="user_info d-flex align-items-center gap-2 flex-wrap">
+          <img class="profile rounded-circle object-fit-cover" src="" alt="profile_image" style="width:36px;height:36px;">
+          <span class="nickname fw-semibold">닉네임</span>
+          <span class="created_time text-muted small">방금 전</span>
+
+          <div class="ms-auto d-flex gap-2">
+            <button class="edit_button btn btn-outline-secondary btn-sm invisible">수정</button>
+            <button class="delete_button btn btn-outline-danger btn-sm invisible">삭제</button>
+          </div>
+        </div>
       </div>
-    </div>
-    <br />
-    <div class="content">
-      <img class="post_image" src="" alt="post_image" />
-      <p class="post_content"></p>
-      <div class="counts">
-        <button class="like_button">좋아요</button>
-        <span class="like_count"></span>
-        <span class="comment_count"></span>
+
+      <!-- 본문: 이미지 + 내용 + 카운트/좋아요 -->
+      <div class="content">
+        <!-- 이미지(여러 장일 경우 캐러셀로 바꿔도 됨) -->
+        <div class="post_images row g-2"></div>
+
+        <!-- 본문 내용 -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <p class="post_content mb-0">
+              내용 로딩 중...
+            </p>
+          </div>
+        </div>
+        <!-- 좋아요/댓글 카운트 -->
+        <div class="counts d-flex justify-content-center align-items-center gap-3 my-4">
+          <!-- 좋아요 박스(클릭 가능한 카드) -->
+          <div class="p-3 border rounded bg-white shadow-sm text-center like_box" role="button" tabindex="0">
+            <span class="d-block text-muted small">좋아요</span>
+            <span class="like_count d-block fw-bold">0</span>
+          </div>
+
+          <!-- 조회수 박스 -->
+          <div class="p-3 border rounded bg-white shadow-sm text-center">
+            <span class="d-block text-muted small">조회</span>
+            <span class="view_count d-block fw-bold">0</span>
+          </div>
+
+          <!-- 댓글수 박스 -->
+          <div class="p-3 border rounded bg-white shadow-sm text-center">
+            <span class="d-block text-muted small">댓글</span>
+            <span class="comment_count d-block fw-bold">0</span>
+          </div>
+        </div>
       </div>
-    </div>
-    <br />
-    <div class="comments_input">
-      <input type="text" class="comment_input" placeholder="댓글을 남겨주세요!" />
-      <br />
-      <button class="comment_button">댓글 등록</button>
-    </div>
-    <div class="comments_section">
-      <div class="user_info">
-        <img class="profile" src="" alt="profile_image" />
-        <span class="nickname"></span>
-        <span class="created_time"></span>
-        <p class="comment_content"></p>
+
+      <!-- 댓글 입력 -->
+      <div class="comments_input card shadow-sm mb-4">
+        <div class="card-body">
+          <label for="commentInput" class="form-label">댓글을 남겨주세요!</label>
+          <input type="text" id="commentInput" class="comment_input form-control" placeholder="댓글을 남겨주세요!" />
+          <div class="d-flex justify-content-end mt-3">
+            <button class="comment_button btn btn-dark">댓글 등록</button>
+          </div>
+        </div>
       </div>
-      <button class="edit_button">수정</button>
-      <button class="delete_button">삭제</button>
+
+      <!-- 댓글 리스트 -->
+      <div class="comments_section">
+        <!-- 댓글 아이템 (반복 렌더링) -->
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <div class="user_info d-flex align-items-center gap-2 flex-wrap">
+              <img class="profile rounded-circle object-fit-cover" src="" alt="profile_image" style="width:32px;height:32px;">
+              <span class="nickname fw-semibold">사용자</span>
+              <span class="created_time text-muted small">1시간 전</span>
+
+              <div class="ms-auto d-flex gap-2">
+                <button class="edit_button btn btn-outline-secondary btn-sm">수정</button>
+                <button class="delete_button btn btn-outline-danger btn-sm">삭제</button>
+              </div>
+            </div>
+
+            <p class="comment_content mb-0 mt-2">
+              댓글 내용 로딩 중...
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
+
+  <script src="/../../components/header/header.js"></script>
+  <script type="module" src="/../../components/post/detail.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

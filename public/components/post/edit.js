@@ -1,11 +1,11 @@
-import { getPostDetail, createPost, updatePost } from "../common/api.js";
+import { getPostDetail, createPost, updatePost, uploadToS3 } from "../common/api.js";
 
 // 요소
 const logo = document.querySelector('.logo');
 const backButton = document.querySelector('.back_button');
 const titleInput = document.querySelector('.title_input');
 const contentInput = document.querySelector('.content_input');
-const imageInput = document.querySelector('.image_input'); // TODO: S3 presigned 업로드
+const imageInput = document.getElementById('imageInput');
 const submitButton = document.querySelector('.submit_button');
 const warningEl = document.querySelector('.warning');
 const pageTitleEl = document.querySelector('.edit_title');
@@ -66,17 +66,19 @@ submitButton?.addEventListener('click', async () => {
   }
   setWarning('');
 
-  // TODO: S3 presigned 업로드 -> 업로드 성공 시 images 배열 채우기
-  // 지금은 과제 최소 구현으로 빈 배열 전송
-  const images = [];
-  // 예) const images = await uploadToS3(imageInput.files) ...
+  // 이미지 파일명 목록 추출
+  const files = imageInput?.files ? Array.from(imageInput.files) : [];
+  const images = files.map(f => f.name);
+  console.log('업로드할 이미지 파일들:', images);
 
-  const body = { title, content, images };
+  const body = JSON.stringify({ title, content, images });
+  console.log('전송 바디:', body);
 
   try {
     let res;
     if (mode === 'create') {
       res = await createPost(body);
+      console.log('게시글 생성 응답:', res);
     } else {
       res = await updatePost(POST_ID, body);
     }
@@ -99,9 +101,25 @@ submitButton?.addEventListener('click', async () => {
 
     // 성공 시 이동: 생성은 목록(/), 수정은 상세(/post/{id})
     if (mode === 'create') {
-      // 생성 API가 생성된 id를 주면 거기로 이동하는 편이 더 좋음
-      // const created = await res.json(); window.location.href = `/post/${created.id}`;
-      window.location.href = '/';
+      const created = await res.json();
+      const presignedUrls = created?.presignedUrls || [];
+
+      if (presignedUrls.length > 0 && imageInput?.files?.length) {
+        const uploadPromises = presignedUrls.map((url, index) => {
+          uploadToS3(url, imageInput.files[index]);
+        });
+
+        try {
+          await Promise.all(uploadPromises);
+          console.log("모든 이미지 업로드 성공");
+        } catch (e) {
+          console.error("이미지 업로드 중 오류:", e);
+          setWarning('일부 이미지 업로드에 실패했어요.');
+          return;
+        }
+      }
+
+      // window.location.href = `/post/${POST_ID}`;
     } else {
       window.location.href = `/post/${POST_ID}`;
     }
