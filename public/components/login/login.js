@@ -53,6 +53,7 @@ submitButton.addEventListener('click', async () => {
     localStorage.setItem('accessToken', res.headers.get('Authorization') || '');
     const data = await res.json();
     localStorage.setItem('profile_image', data.profileImageUrl || '');
+    localStorage.setItem('nickname', data.nickname || '');
     localStorage.setItem('user_id', data.userId || '');
 
     // 로그인 성공 후 메인 페이지로 리다이렉트

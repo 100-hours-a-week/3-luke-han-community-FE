@@ -78,16 +78,22 @@ export async function getPostDetail(postId) {
 }
 
 /**
- * 댓글 생성
+ * 댓글 생성 (최상위/대댓글 공통)
+ * @param {number|string} postId
+ * @param {string} content - 실제 댓글 내용
+ * @param {number} parentId - 부모 댓글 id (최상위 댓글이면 0)
  */
-export async function createComment(postId, comment) {
+export async function createComment(postId, content, parentId = 0) {
   return fetch(API_BASE_URL + `/api/posts/${postId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body: JSON.stringify({ comment }),
+    body: JSON.stringify({
+      parentId: parentId,
+      content: content,
+    }),
     credentials: 'include',
   });
 }
@@ -128,6 +134,30 @@ export async function updatePost(postId, body) {
       'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: body,
+    credentials: 'include',
+  });
+}
+
+/** 게시글 좋아요 */
+export async function likePost(postId) {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/likes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    credentials: 'include',
+  });
+}
+
+/** 좋아요 취소 */
+export async function unlikePost(postId) {
+  return fetch(API_BASE_URL + `/api/posts/${postId}/likes`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
     credentials: 'include',
   });
 }

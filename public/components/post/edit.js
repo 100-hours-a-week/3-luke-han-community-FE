@@ -71,7 +71,9 @@ submitButton?.addEventListener('click', async () => {
   const images = files.map(f => f.name);
   console.log('업로드할 이미지 파일들:', images);
 
-  const body = JSON.stringify({ title, content, images });
+  const isImageChanged = mode === 'edit' && files.length > 0;
+
+  const body = JSON.stringify({ title, content, images, isImageChanged });
   console.log('전송 바디:', body);
 
   try {
