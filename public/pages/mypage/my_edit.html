@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
+  <title>회원정보 수정</title>
+  <style>
+    body { background:#f4f5f7; }
+    .profile_preview {
+      width:72px;
+      height:72px;
+      border-radius:50%;
+      object-fit:cover;
+      background-color:#eee;
+    }
+  </style>
+</head>
+<body class="text-dark" style="background:#f4f5f7;">
+  <!-- Header -->
+  <header id="header-component"></header>
+
+  <!-- Main -->
+  <main>
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+          <h1 class="h4 fw-bold text-center mb-4">회원정보 수정</h1>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <!-- 프로필 사진 -->
+              <div class="mb-3">
+                <label class="form-label">프로필 사진</label>
+
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                  <!-- 현재 프로필 이미지 미리보기 -->
+                  <img
+                    src="/assets/image/default_profile.png"
+                    alt="현재 프로필 이미지"
+                    class="profile_preview border"
+                    id="edit-profile-preview"
+                  />
+
+                  <div class="flex-grow-1">
+                    <input
+                      id="edit-profile-file"
+                      type="file"
+                      class="form-control"
+                      accept="image/*"
+                    />
+                    <div class="form-text text-danger" id="warn-photo" hidden></div>
+                    <div class="form-text text-muted">
+                      5MB 이하 이미지를 업로드해주세요.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 이메일 (수정 불가) -->
+              <div class="mb-3">
+                <label class="form-label">이메일</label>
+                <p class="form-control-plaintext mb-0" id="edit-email">example@example.com</p>
+              </div>
+
+              <!-- 닉네임 -->
+              <div class="mb-3">
+                <label for="edit-nickname" class="form-label">닉네임 <span class="text-danger">*</span></label>
+
+                <div class="row g-2 align-items-center">
+                  <div class="col-8">
+                    <input
+                      id="edit-nickname"
+                      type="text"
+                      class="form-control"
+                      placeholder="닉네임을 입력하세요"
+                      value="현재닉네임"
+                    />
+                  </div>
+                  <div class="col-4 d-grid">
+                    <button
+                      class="btn btn-outline-secondary"
+                      id="nickname-check-btn"
+                      type="button"
+                    >
+                      중복확인
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 닉네임 경고 -->
+                <div class="form-text text-danger" id="warn-nickname" hidden></div>
+              </div>
+
+              <!-- 저장 버튼 -->
+              <button class="btn btn-dark w-100 py-2" id="edit-save-btn" type="button">
+                변경사항 저장
+              </button>
+
+              <!-- 보조 액션: 비밀번호 변경 이동 -->
+              <div class="d-flex justify-content-between align-items-center mt-3 small">
+                <span class="text-muted">비밀번호를 바꾸고 싶으신가요?</span>
+                <a href="/user/password" class="link-dark fw-semibold">비밀번호 변경</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- 전역 경고 영역 -->
+          <div id="form-warning" class="form-text text-danger mt-3" hidden></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- JS -->
+  <script src="/../../components/header/header.js"></script>
+  <script type="module" src="/../../components/mypage/my_edit.js"></script>
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

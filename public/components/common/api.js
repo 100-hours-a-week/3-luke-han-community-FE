@@ -22,6 +22,42 @@ export async function login(body) {
 };
 
 /**
+ * 이메일 중복검사 API
+ * 
+ * @param {*} email 
+ * @returns 
+ */
+export async function checkEmailDuplicate(email) {
+  const res = await fetch(API_BASE_URL + `/api/auth/duplications/email`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  return res;
+}
+
+/**
+ * 닉네임 중복검사 API
+ * 
+ * @param {*} nickname 
+ * @returns 
+ */
+export async function checkNicknameDuplicate(nickname) {
+  const res = await fetch(API_BASE_URL + `/api/auth/duplications/nickname`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ nickname }),
+  });
+
+  return res;
+}
+
+/**
  * 회원가입 API
  * - url과 body를 받아서 fetch 요청을 보냄
  * 
@@ -41,6 +77,46 @@ export async function signup(body) {
 
   return res;
 };
+
+/**
+ * 회원정보 수정 API
+ * 
+ * @param {*} body 
+ * @returns 
+ */
+export async function updateUserProfile(body) {
+  const res = await fetch(API_BASE_URL + `/api/users`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    body: JSON.stringify(body),
+    credentials: 'include',
+  });
+
+  return res;
+}
+
+/**
+ * 비밀번호 수정 API
+ * 
+ * @param {*} body 
+ * @returns 
+ */
+export async function updateUserPassword(body) {
+  const res = await fetch(API_BASE_URL + `/api/users/password`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    body: JSON.stringify(body),
+    credentials: 'include',
+  });
+
+  return res;
+}
 
 /**
  * 게시글 목록 조회 API

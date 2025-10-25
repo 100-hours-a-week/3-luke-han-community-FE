@@ -10,10 +10,6 @@ const submitButton = document.querySelector('.submit_button');
 const warningEl = document.querySelector('.warning');
 const pageTitleEl = document.querySelector('.edit_title');
 
-// 이동
-logo?.addEventListener('click', () => (window.location.href = '/'));
-backButton?.addEventListener('click', () => window.history.back());
-
 // 경고 표시
 function setWarning(msg) {
   if (!warningEl) return;
