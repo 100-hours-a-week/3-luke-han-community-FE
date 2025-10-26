@@ -22,6 +22,24 @@ export async function login(body) {
 };
 
 /**
+ * 로그아웃 API
+ * 
+ * @returns 
+ */
+export async function logout() {
+  const res = await fetch(API_BASE_URL + `/api/auth/logout`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': localStorage.getItem('accessToken') || '',
+    },
+    credentials: 'include',
+  });
+
+  return res;
+}
+
+/**
  * 이메일 중복검사 API
  * 
  * @param {*} email 
@@ -52,6 +70,38 @@ export async function checkNicknameDuplicate(nickname) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ nickname }),
+  });
+
+  return res;
+}
+
+/**
+ * 서비스 이용약관
+ * 
+ * @returns 
+ */
+export async function getTerms() {
+  const res = await fetch(API_BASE_URL + `/terms`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'text/html',
+    },
+  });
+
+  return res;
+}
+
+/**
+ * 개인정보처리방침
+ * 
+ * @returns 
+ */
+export async function getPrivacyPolicy() {
+  const res = await fetch(API_BASE_URL + `/privacy`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'text/html',
+    },
   });
 
   return res;

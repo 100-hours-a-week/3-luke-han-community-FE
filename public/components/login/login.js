@@ -6,7 +6,7 @@ const passwordInput = document.querySelector('input[type="password"]');
 const submitButton = document.querySelector('.submit_button');
 const warningEl = document.getElementById('form-warning');
 
-const email = '';
+let email = '';
 
 /**
  * 입력값에 대해 경고문구 렌더링 처리 함수
@@ -54,7 +54,7 @@ submitButton.addEventListener('click', async () => {
 
     localStorage.setItem('accessToken', res.headers.get('Authorization') || '');
     const data = await res.json();
-    localStorage.setItem('profile_image', data.profileImageUrl || '');
+    localStorage.setItem('profile_image', data.profileImageUrl || '/assets/image/default_profile.png');
     localStorage.setItem('nickname', data.nickname || '');
     localStorage.setItem('email', email || '');
     localStorage.setItem('user_id', data.userId || '');

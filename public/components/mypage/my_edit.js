@@ -1,5 +1,5 @@
-import { checkNicknameDuplicate, updateUserProfile, uploadToS3 } from "../common/api";
-import { renderUserInput } from "../common/common";
+import { checkNicknameDuplicate, logout, updateUserProfile, uploadToS3 } from "../common/api.js";
+import { renderUserInput } from "../common/common.js";
 
 const profilePreviewEl = document.getElementById('edit-profile-preview');
 const newProfileInput = document.getElementById('edit-profile-file');
@@ -12,6 +12,8 @@ const nicknameWarnEl = document.getElementById('warn-nickname');
 const nicknameCheckButton = document.getElementById('nickname-check-btn');
 
 const submitButton = document.getElementById('edit-save-btn');
+
+const logoutButton = document.getElementById('logout-btn');
 
 const formWarnEl = document.getElementById('form-warning');
 const WARN_SELECTOR = '#form-warning';
@@ -283,6 +285,26 @@ submitButton?.addEventListener('click', async () => {
   nicknameCheckedOK = true;
   pendingProfileFile = null;
   setFormWarning('변경사항이 저장되었습니다.');
+});
+
+logoutButton?.addEventListener('click', async () => {
+  const res = await logout();
+  console.log(res);
+
+  if (!res.ok) {
+    setFormWarning('로그아웃에 실패했어요. 잠시 후 다시 시도해주세요.');
+    return;
+  }
+
+  // 로컬 스토리지 정리
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('user_id');
+  localStorage.removeItem('email');
+  localStorage.removeItem('nickname');
+  localStorage.removeItem('profile_image');
+
+  // 로그인 페이지로 이동
+  window.location.href = '/login';
 });
 
 /* =========================================
