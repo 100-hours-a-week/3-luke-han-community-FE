@@ -55,6 +55,41 @@
                 <div class="form-text text-danger" id="warn-nickname" hidden></div>
               </div>
 
+              <!-- ★ 약관 동의 -->
+              <div class="border rounded p-3 mb-3 bg-light">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="agree-terms" />
+                  <label class="form-check-label small" for="agree-terms">
+                    [필수] 서비스 이용약관 동의
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0 align-baseline text-decoration-none"
+                      data-bs-toggle="modal"
+                      data-bs-target="#termsModal"
+                    >
+                      보기
+                    </button>
+                  </label>
+                </div>
+
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="agree-privacy" />
+                  <label class="form-check-label small" for="agree-privacy">
+                    [필수] 개인정보처리방침 동의
+                    <button
+                      type="button"
+                      class="btn btn-link btn-sm p-0 align-baseline text-decoration-none"
+                      data-bs-toggle="modal"
+                      data-bs-target="#privacyModal"
+                    >
+                      보기
+                    </button>
+                  </label>
+                </div>
+
+                <div class="form-text text-danger" id="warn-agree" hidden></div>
+              </div>
+
               <!-- 제출 버튼 -->
               <button class="submit_button btn btn-dark w-100 py-2" type="submit">회원가입</button>
 
@@ -72,6 +107,48 @@
       </div>
     </div>
   </main>
+
+  <!-- ★ 이용약관 모달 -->
+  <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg"> 
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">서비스 이용약관</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 여기에서 서버의 /terms 내용을 그대로 불러와서 채울 거임 (JS에서 fetch) -->
+          <div id="terms-content" class="small text-dark">
+            로딩 중...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ★ 개인정보처리방침 모달 -->
+  <div class="modal fade" id="privacyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg"> 
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">개인정보처리방침</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+        </div>
+        <div class="modal-body">
+          <!-- 여기에서 서버의 /privacy 내용을 그대로 불러와서 채울 거임 (JS에서 fetch) -->
+          <div id="privacy-content" class="small text-dark">
+            로딩 중...
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- JS -->
    <script src="/../../components/header/header.js"></script>

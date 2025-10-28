@@ -6,11 +6,13 @@ const passwordInput = document.querySelector('input[type="password"]');
 const submitButton = document.querySelector('.submit_button');
 const warningEl = document.getElementById('form-warning');
 
+let email = '';
+
 /**
  * 입력값에 대해 경고문구 렌더링 처리 함수
  */
 function validateInputs() {
-  const email = emailInput.value.trim();
+  email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   renderUserInput(
     warningEl,
@@ -22,7 +24,7 @@ emailInput.addEventListener('input', validateInputs);
 passwordInput.addEventListener('input', validateInputs);
 
 submitButton.addEventListener('click', async () => {
-  const email = emailInput.value.trim();
+  email = emailInput.value.trim();
   const password = passwordInput.value.trim();
   const form = new URLSearchParams();
   form.append('username', email);
@@ -52,7 +54,9 @@ submitButton.addEventListener('click', async () => {
 
     localStorage.setItem('accessToken', res.headers.get('Authorization') || '');
     const data = await res.json();
-    localStorage.setItem('profile_image', data.profileImageUrl || '');
+    localStorage.setItem('profile_image', data.profileImageUrl || '/assets/image/default_profile.png');
+    localStorage.setItem('nickname', data.nickname || '');
+    localStorage.setItem('email', email || '');
     localStorage.setItem('user_id', data.userId || '');
 
     // 로그인 성공 후 메인 페이지로 리다이렉트

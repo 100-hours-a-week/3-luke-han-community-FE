@@ -8,6 +8,8 @@ const initHeader = () => {
   let profileImage = '';
   let gridTemplate = 'auto 1fr auto';
 
+  const profileLink = localStorage.getItem('profile_image') || '/assets/image/default_profile.png';
+
   if (path === '/login') {
     backButton = '';
     profileImage = '';
@@ -50,7 +52,7 @@ const initHeader = () => {
 
     const profile = document.getElementById('profile');
     profile?.addEventListener('click', () => {
-      window.location.href = '/profile';
+      window.location.href = '/mypage/edit';
     });
 };
 

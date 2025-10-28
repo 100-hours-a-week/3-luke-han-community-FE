@@ -26,4 +26,12 @@ router.get('/post/:id', (req, res) => {
   res.sendFile(path.join(__dirname, './public/pages/post/post_detail.html'));
 });
 
+router.get('/mypage/edit', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/pages/mypage/my_edit.html'));
+});
+
+router.get('/mypage/password', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/pages/mypage/password_edit.html'));
+});
+
 module.exports = router;

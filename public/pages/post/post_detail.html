@@ -50,7 +50,7 @@
         <div class="counts d-flex justify-content-center align-items-center gap-3 my-4">
           <!-- 좋아요 박스(클릭 가능한 카드) -->
           <div class="p-3 border rounded bg-white shadow-sm text-center like_box" role="button" tabindex="0">
-            <span class="d-block text-muted small">좋아요</span>
+            <span class="like_label d-block text-muted small">좋아요</span>
             <span class="like_count d-block fw-bold">0</span>
           </div>
 
@@ -82,7 +82,7 @@
       <!-- 댓글 리스트 -->
       <div class="comments_section">
         <!-- 댓글 아이템 (반복 렌더링) -->
-        <div class="card shadow-sm mb-3">
+        <div class="comment_item card shadow-sm mb-3">
           <div class="card-body">
             <div class="user_info d-flex align-items-center gap-2 flex-wrap">
               <img class="profile rounded-circle object-fit-cover" src="" alt="profile_image" style="width:32px;height:32px;">
@@ -98,6 +98,14 @@
             <p class="comment_content mb-0 mt-2">
               댓글 내용 로딩 중...
             </p>
+
+            <button class="reply_button btn btn-sm btn-light mt-2">답글 달기</button>
+
+            <div class="children_wrap mt-3"></div>
+
+            <button class="load-more-replies btn btn-link btn-sm text-decoration-none p-0 mt-2 d-none">
+              댓글 더보기
+            </button>
           </div>
         </div>
       </div>

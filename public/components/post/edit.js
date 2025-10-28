@@ -10,10 +10,6 @@ const submitButton = document.querySelector('.submit_button');
 const warningEl = document.querySelector('.warning');
 const pageTitleEl = document.querySelector('.edit_title');
 
-// 이동
-logo?.addEventListener('click', () => (window.location.href = '/'));
-backButton?.addEventListener('click', () => window.history.back());
-
 // 경고 표시
 function setWarning(msg) {
   if (!warningEl) return;
@@ -71,7 +67,9 @@ submitButton?.addEventListener('click', async () => {
   const images = files.map(f => f.name);
   console.log('업로드할 이미지 파일들:', images);
 
-  const body = JSON.stringify({ title, content, images });
+  const isImageChanged = mode === 'edit' && files.length > 0;
+
+  const body = JSON.stringify({ title, content, images, isImageChanged });
   console.log('전송 바디:', body);
 
   try {
