@@ -12,7 +12,7 @@ export async function login(body) {
   const res = await fetch(API_BASE_URL + `/api/auth/signin`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'Content-Type': 'application/json',
     },
     body: body,
     credentials: 'include',
@@ -31,7 +31,6 @@ export async function logout() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });
@@ -139,7 +138,6 @@ export async function updateUserProfile(body) {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify(body),
     credentials: 'include',
@@ -159,7 +157,6 @@ export async function updateUserPassword(body) {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify(body),
     credentials: 'include',
@@ -181,7 +178,6 @@ export async function getPosts(cursor = 0, size = 20) {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });
@@ -197,7 +193,6 @@ export async function getPostDetail(postId) {
     method: 'GET',
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });
@@ -214,7 +209,6 @@ export async function createComment(postId, content, parentId = 0) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify({
       parentId: parentId,
@@ -232,7 +226,6 @@ export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });
@@ -244,7 +237,6 @@ export async function createPost(body) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body,
     credentials: 'include',
@@ -257,7 +249,6 @@ export async function updatePost(postId, body) {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: body,
     credentials: 'include',
@@ -270,7 +261,6 @@ export async function likePost(postId) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });
@@ -282,7 +272,6 @@ export async function unlikePost(postId) {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     credentials: 'include',
   });

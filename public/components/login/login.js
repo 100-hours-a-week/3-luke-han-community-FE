@@ -26,9 +26,10 @@ passwordInput.addEventListener('input', validateInputs);
 submitButton.addEventListener('click', async () => {
   email = emailInput.value.trim();
   const password = passwordInput.value.trim();
-  const form = new URLSearchParams();
-  form.append('username', email);
-  form.append('password', password);
+  const body = {
+    email: email,
+    password: password,
+  };
 
   if (!email || !password) {
     renderUserInput(warningEl, '모든 필드를 채워주세요.');
@@ -37,7 +38,7 @@ submitButton.addEventListener('click', async () => {
   renderUserInput(warningEl, '');
 
   try {
-    const res = await login(form.toString());
+    const res = await login(JSON.stringify(body));
 
     if (!res.ok) {
       let msg = '로그인 실패';
