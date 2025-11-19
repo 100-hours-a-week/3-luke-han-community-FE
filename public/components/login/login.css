@@ -1,0 +1,114 @@
+/* 전체 래퍼 */
+.auth-wrapper {
+  max-width: var(--layout-width);
+  margin: 48px auto;
+  padding: 0 18px;
+}
+
+/* 페이지 타이틀 */
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-main);
+  margin-bottom: 28px;
+}
+
+/* 카드 */
+.auth-card {
+  background: var(--bg-surface);
+  padding: 32px 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+}
+
+/* 필드 */
+.auth-field {
+  margin-bottom: 22px;
+}
+
+.auth-label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  display: block;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* 최신 input 스타일 */
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-soft);
+  font-size: 15px;
+  color: var(--text-main);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+  outline: none;
+}
+
+/* 인풋 에러 메시지 */
+.auth-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+/* 서버/전역 에러 메시지 */
+.auth-error-global {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c;
+  font-size: 14px;
+  border-radius: 8px;
+  border-left: 4px solid #dc2626;
+}
+
+/* 로그인 버튼 (요즘형) */
+.auth-submit {
+  width: 100%;
+  padding: 14px 0;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.auth-submit:hover {
+  background: #4338ca;
+}
+
+.auth-submit:active {
+  transform: scale(0.97);
+}
+
+/* 하단 링크 */
+.auth-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.auth-link-subtle {
+  color: var(--text-sub);
+  text-decoration: underline;
+}
+
+.auth-link-main {
+  color: var(--accent);
+  font-weight: 600;
+}
