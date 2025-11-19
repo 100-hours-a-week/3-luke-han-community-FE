@@ -12,7 +12,7 @@ export async function login(body) {
   const res = await fetch(API_BASE_URL + `/api/auth/signin`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'Content-Type': 'application/json',
     },
     body: body,
     credentials: 'include',
