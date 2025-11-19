@@ -1,5 +1,6 @@
-import { useInput } from "../../utils/hooks";
-import { validateEmail, validatePassword } from "../../utils/validator";
+import { useInput } from "../../utils/hooks.js";
+import { validateEmail, validatePassword } from "../../utils/validator.js";
+import { renderMessage } from "../../utils/alerts.js";
 
 // 로그인 페이지 UI
 export function LoginPage() {
