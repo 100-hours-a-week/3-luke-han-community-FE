@@ -106,3 +106,21 @@ export function validateAgreements(termsChecked, privacyChecked, warnEl) {
   renderMessage(warnEl, "", { autoHide: true });
   return true;
 }
+
+/**
+ * 공통 필수 입력 검증
+ * @param {string} value
+ * @param {HTMLElement|string} warnEl
+ * @param {string} message - 비어있을 때 보여줄 메시지
+ */
+export function validateRequired(value, warnEl, message = "필수 입력값입니다.") {
+  const v = value?.trim() ?? "";
+
+  if (!v) {
+    renderMessage(warnEl, message, { type: "error" });
+    return false;
+  }
+
+  renderMessage(warnEl, "", { autoHide: true });
+  return true;
+}

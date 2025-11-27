@@ -1,5 +1,5 @@
 import { renderMessage } from "../../../utils/alerts.js";
-import { useInput } from "../../../utils/hooks.js";
+import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateEmail, validatePassword } from "../../../utils/validator.js";
 import { configureHeader } from "../../molecules/header/header.js";
 
@@ -37,5 +37,8 @@ export function initLoginPage() {
     }
 
     // TODO: 로그인 API 호출
-  })
+  });
+
+  registerEnterSubmit(emailInput.element, () => loginBtn?.click());
+  registerEnterSubmit(passwordInput.element, () => loginBtn?.click());
 }

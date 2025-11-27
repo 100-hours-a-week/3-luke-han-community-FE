@@ -1,5 +1,5 @@
 import { renderMessage } from "../../../utils/alerts.js";
-import { useInput } from "../../../utils/hooks.js";
+import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../../utils/validator.js";
 import { configureHeader } from "../../../molecules/header/Header.js";
 
@@ -99,5 +99,10 @@ export function initSignupPage() {
     window.router?.navigate
     ? window.router.navigate('/login')
     : (window.location.href = '/login');
-  })
+  });
+
+  registerEnterSubmit(emailInput.element, () => signupBtn?.click());
+  registerEnterSubmit(passwordInput.element, () => signupBtn?.click());
+  registerEnterSubmit(password2Input.element, () => signupBtn?.click());
+  registerEnterSubmit(nicknameInput.element, () => signupBtn?.click());
 }

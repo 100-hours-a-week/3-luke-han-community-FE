@@ -1,5 +1,6 @@
 import { renderMessage } from "../../../../utils/alerts";
-import { configureHeader } from "../../../molecules/header/Header";
+import { registerEnterSubmit } from "../../../../utils/commonHooks.js";
+import { configureHeader } from "../../../molecules/header/header.js";
 
 export function getModeAndId(pathname = window.location.pathname) {
   const createMatch = /^\/post\/create$/.test(pathname);
@@ -74,4 +75,7 @@ export function initPostFormPage() {
   });
 
   prefillIfEdit();
+  
+  registerEnterSubmit(titleInput, () => submitBtn?.click());
+  registerEnterSubmit(contentInput, () => submitBtn?.click());
 }

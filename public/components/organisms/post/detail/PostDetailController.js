@@ -1,7 +1,8 @@
 import { renderMessage } from "../../../../utils/alerts.js";
+import { registerEnterSubmit } from "../../../../utils/commonHooks.js";
 import { renderUserInput } from "../../../../utils/renderUtil.js";
 import { createCommentItem } from "../../../molecules/comment/CommentItem.js";
-import { configureHeader } from "../../../molecules/header/Header.js";
+import { configureHeader } from "../../../molecules/header/header.js";
 import { closeModal, openModal } from "../../../molecules/modal/ModalController.js";
 
 function getPostIdFromPath(pathname = window.location.pathname) {
@@ -179,6 +180,8 @@ export function initPostDetailPage() {
     // TODO: 댓글 등록 API 호출 및 UI 업데이트
   });
 
+  registerEnterSubmit(commentInput, () => commentSubmit?.click());
+
   commentsContainer?.addEventListener('click', (e) => {
     const item = e.target.closest('.comment_item');
     if (!item) return;
@@ -199,6 +202,14 @@ export function initPostDetailPage() {
         // 닫히는 경우 입력값 초기화
         replyInput.value = "";
       } else {
+        // 처음 열리는 경우 이벤트 등록
+        if (!replyInput.dataset.enterSubmitBound) {
+          const replySubmitBtn = item.querySelector(".reply-submit");
+          registerEnterSubmit(replyInput, () => {
+            replySubmitBtn?.click();
+          });
+          replyInput.dataset.enterSubmitBound = "true";
+        }
         // 열리는 경우 포커스
         replyInput.focus();
       }
@@ -231,9 +242,20 @@ export function initPostDetailPage() {
     // 4) 댓글 "수정" 버튼 클릭 → 인라인 편집 모드로
     if (e.target.matches(".edit_button")) {
       if (!editWrap || !editInput || !contentEl) return;
+
       editInput.value = contentEl.textContent.trim();
       contentEl.classList.add("d-none");
       editWrap.classList.remove("d-none");
+
+      // 처음 열리릴 때 이벤트 등록
+      if (!editInput.dataset.enterSubmitBound) {
+        const editSaveBtn = item.querySelector(".comment-edit-save");
+        registerEnterSubmit(editInput, () => {
+          editSaveBtn?.click();
+        });
+        editInput.dataset.enterSubmitBound = "true";
+      }
+
       editInput.focus();
       return;
     }
