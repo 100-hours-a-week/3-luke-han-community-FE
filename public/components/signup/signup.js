@@ -1,226 +1,186 @@
-import { getPrivacyPolicy, getTerms, signup, uploadToS3 } from "../common/api.js";
-import { renderUserInput } from "../common/common.js";
+import { renderMessage } from "../../utils/alerts.js";
+import { useInput } from "../../utils/hooks.js";
+import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../utils/validator.js";
 
-// ===== DOM =====
-const emailInput = document.querySelector('input[type="email"]');
-const passwordInputs = document.querySelectorAll('input[type="password"]');
-const password1Input = passwordInputs[0];
-const password2Input = passwordInputs[1];
-const nicknameInput = document.querySelector('input[type="text"]');
-const submitButton = document.querySelector('.submit_button');
+export function SignupPage() {
+  return `
+    <div class="auth-wrapper">
 
-const emailWarn = document.getElementById('warn-email');
-const passwordWarn = document.getElementById('warn-password');
-const passwordCheckWarn = document.getElementById('warn-password-check');
-const nicknameWarn = document.getElementById('warn-nickname');
-const agreeWarn = document.getElementById('warn-agree');
-const globalWarnSel = '#form-warning';
+      <h1 class="auth-title">회원가입</h1>
 
-const agreeTermsCheck = document.getElementById('agree-terms');
-const agreePrivacyCheck = document.getElementById('agree-privacy');
+      <div class="auth-card">
 
-// 모달 내부 컨테이너
-const termsContentEl = document.getElementById('terms-content');
-const privacyContentEl = document.getElementById('privacy-content');
+        <!-- 이메일 -->
+        <div class="auth-field">
+          <label for="signup-email" class="auth-label">이메일</label>
+          <input id="signup-email" type="email" class="auth-input" />
+          <div id="signup-email-error" class="auth-error" hidden></div>
+        </div>
 
-// ===== 유효성 검사 =====
+        <!-- 비밀번호 -->
+        <div class="auth-field">
+          <label for="signup-password" class="auth-label">비밀번호</label>
+          <input id="signup-password" type="password" class="auth-input" />
+          <div id="signup-password-error" class="auth-error" hidden></div>
+        </div>
 
-function validateEmail() {
-  const email = emailInput?.value.trim() ?? "";
+        <!-- 비밀번호 확인 -->
+        <div class="auth-field">
+          <label for="signup-password2" class="auth-label">비밀번호 확인</label>
+          <input id="signup-password2" type="password" class="auth-input" />
+          <div id="signup-password2-error" class="auth-error" hidden></div>
+        </div>
 
-  if (!email) {
-    renderUserInput(emailWarn, '이메일을 입력해주세요.', { autoHide: true });
-    return false;
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    renderUserInput(emailWarn, '유효한 이메일 형식이 아닙니다.', { autoHide: true });
-    return false;
-  }
+        <!-- 닉네임 -->
+        <div class="auth-field">
+          <label for="signup-nickname" class="auth-label">닉네임</label>
+          <input id="signup-nickname" type="text" class="auth-input" />
+          <div id="signup-nickname-error" class="auth-error" hidden></div>
+        </div>
 
-  renderUserInput(emailWarn, '', { autoHide: false });
-  return true;
+        <!-- 프로필 이미지 (선택) -->
+        <div class="auth-field">
+          <label for="signup-profile" class="auth-label">프로필 이미지 (선택)</label>
+          <input id="signup-profile" type="file" class="auth-input-file" accept="image/*" />
+          <div class="auth-helper-text">이미지를 선택하지 않으면 기본 프로필로 설정됨</div>
+        </div>
+
+        <!-- 약관 동의 -->
+        <div class="auth-field auth-agree-group">
+          <div class="auth-checkbox-row">
+            <input id="agree-terms" type="checkbox" class="auth-checkbox" />
+            <label for="agree-terms" class="auth-checkbox-label">
+              이용약관 동의
+            </label>
+            <button type="button" class="auth-link-inline" id="open-terms">
+              내용 보기
+            </button>
+          </div>
+
+          <div class="auth-checkbox-row">
+            <input id="agree-privacy" type="checkbox" class="auth-checkbox" />
+            <label for="agree-privacy" class="auth-checkbox-label">
+              개인정보 처리방침 동의
+            </label>
+            <button type="button" class="auth-link-inline" id="open-privacy">
+              내용 보기
+            </button>
+          </div>
+
+          <div id="signup-agree-error" class="auth-error" hidden></div>
+        </div>
+
+        <!-- 약관 / 개인정보 모달 컨테이너 (SPA 기준, 나중에 모달로 바꿔도 됨) -->
+        <div id="terms-content" class="auth-terms-content" hidden></div>
+        <div id="privacy-content" class="auth-terms-content" hidden></div>
+
+        <!-- 서버/전역 오류 -->
+        <div id="signup-form-error" class="auth-error-global" hidden></div>
+
+        <!-- 가입 버튼 -->
+        <button id="signupBtn" class="auth-submit">회원가입</button>
+
+        <!-- 하단 링크 -->
+        <div class="auth-links">
+          <span class="auth-link-subtle">이미 계정이 있으신가요?</span>
+          <a href="/login" class="auth-link-main">로그인</a>
+        </div>
+
+      </div>
+
+    </div>
+  `;
 }
 
-function validatePassword() {
-  const pw1 = password1Input?.value.trim() ?? "";
+export function initSignupPage() {
+  const emailInput = useInput("signup-email");
+  const passwordInput = useInput("signup-password");
+  const password2Input = useInput("signup-password2");
+  const nicknameInput = useInput("signup-nickname");
+  const profileInput = document.getElementById("signup-profile");
 
-  if (!pw1) {
-    renderUserInput(passwordWarn, '비밀번호를 입력해주세요.', { autoHide: true });
-    return false;
-  }
-  if (pw1.length < 8) {
-    renderUserInput(passwordWarn, '비밀번호는 최소 8자 이상이어야 합니다.', { autoHide: true });
-    return false;
-  }
-  if (pw1.length > 20) {
-    renderUserInput(passwordWarn, '비밀번호는 최대 20자 이하여야 합니다.', { autoHide: true });
-    return false;
-  }
-  if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/.test(pw1)) {
-    renderUserInput(
-      passwordWarn,
-      '비밀번호는 대문자, 소문자, 숫자, 특수문자를 각각 최소 1개 이상 포함해야 합니다.',
-      { autoHide: true }
-    );
-    return false;
-  }
+  const emailError = document.getElementById("signup-email-error");
+  const passwordError = document.getElementById("signup-password-error");
+  const password2Error = document.getElementById("signup-password2-error");
+  const nicknameError = document.getElementById("signup-nickname-error");
+  const agreeError = document.getElementById("signup-agree-error");
+  const formError = document.getElementById("signup-form-error");
 
-  renderUserInput(passwordWarn, '', { autoHide: false });
-  return true;
-}
+  const agreeTermsCheck = document.getElementById("agree-terms");
+  const agreePrivacyCheck = document.getElementById("agree-privacy");
 
-function validateReInputPassword() {
-  const pw1 = password1Input?.value.trim() ?? "";
-  const pw2 = password2Input?.value.trim() ?? "";
+  const signupBtn = document.getElementById("signupBtn");
 
-  if (pw1 !== pw2) {
-    renderUserInput(passwordCheckWarn, '비밀번호가 일치하지 않습니다.', { autoHide: true });
-    return false;
-  }
+  const termsContentEl = document.getElementById("terms-content");
+  const privacyContentEl = document.getElementById("privacy-content");
 
-  renderUserInput(passwordCheckWarn, '', { autoHide: false });
-  return true;
-}
+  emailInput.element?.addEventListener('input', () => {
+    validateEmail(emailInput.value(), emailError);
+  });
 
-function validateNickname() {
-  const nick = nicknameInput?.value.trim() ?? "";
+  passwordInput.element?.addEventListener('input', () => {
+    validatePassword(passwordInput.value(), passwordError);
+    validateReInputPassword(passwordInput.value(), password2Input.value(), password2Error);
+  });
 
-  if (!nick) {
-    renderUserInput(nicknameWarn, '닉네임을 입력해주세요.', { autoHide: true });
-    return false;
-  }
-  if (nick.length < 2 || nick.length > 10) {
-    renderUserInput(nicknameWarn, '닉네임은 2자 이상 10자 이하여야 합니다.', { autoHide: true });
-    return false;
-  }
-  if (/\s/.test(nick)) {
-    renderUserInput(nicknameWarn, '닉네임에는 공백이 포함될 수 없습니다.', { autoHide: true });
-    return false;
-  }
+  password2Input.element?.addEventListener('input', () => {
+    validateReInputPassword(passwordInput.value(), password2Input.value(), password2Error);
+  });
 
-  renderUserInput(nicknameWarn, '', { autoHide: false });
-  return true;
-}
+  nicknameInput.element?.addEventListener('input', () => {
+    validateNickname(nicknameInput.value(), nicknameError);
+  });
 
-// ★ 약관 동의 확인
-function validateAgreements() {
-  const termsOk = !!agreeTermsCheck?.checked;
-  const privacyOk = !!agreePrivacyCheck?.checked;
+  agreeTermsCheck.addEventListener('change', () => {
+    validateAgreements(agreeTermsCheck.checked, agreePrivacyCheck.checked, agreeError);
+  });
 
-  if (!termsOk || !privacyOk) {
-    renderUserInput(agreeWarn, '약관 및 개인정보처리방침에 동의해주세요.', { autoHide: true });
-    return false;
-  }
+  agreePrivacyCheck.addEventListener('change', () => {
+    validateAgreements(agreeTermsCheck.checked, agreePrivacyCheck.checked, agreeError);
+  });
 
-  renderUserInput(agreeWarn, '', { autoHide: false });
-  return true;
-}
+  const openTermsBtn = document.getElementById('open-terms');
+  const openPrivacyBtn = document.getElementById('open-privacy');
 
-// ===== 실시간 이벤트 바인딩 =====
-emailInput?.addEventListener('input', validateEmail);
-password1Input?.addEventListener('input', () => {
-  validatePassword();
-  validateReInputPassword(); // pw1 바뀌면 일치 여부도 다시 체크
-});
-password2Input?.addEventListener('input', validateReInputPassword);
-nicknameInput?.addEventListener('input', validateNickname);
+  openTermsBtn?.addEventListener('click', () => {
+    if (!termsContentEl) return;
+    // TODO: 약관 가져오기
+    termsContentEl.hidden = !termsContentEl.hidden;
+  });
 
-agreeTermsCheck?.addEventListener('change', validateAgreements);
-agreePrivacyCheck?.addEventListener('change', validateAgreements);
+  openPrivacyBtn?.addEventListener('click', () => {
+    if (!privacyContentEl) return;
+    // TODO: 개인정보처리방침 가져오기
+    privacyContentEl.hidden = !privacyContentEl.hidden;
+  });
 
-// ===== 모달 내용 로드 =====
-// 서버에서 /terms, /privacy는 Thymeleaf 뷰를 리턴해야 하는데
-// 지금 컨트롤러가 @RestController로 되어 있고 그냥 "terms" 문자열을 리턴하고 있음.
-// 그 상태면 그냥 문자열 "terms"만 와. (== html 아님)
-// 만약 실제 HTML을 받고 싶으면 컨트롤러를 @Controller로 바꾸고
-// return "terms"; // -> templates/terms.html 렌더된 결과
-// 으로 해야 함.
-// 일단 여기서는 GET /terms, /privacy 결과를 그대로 박아주자.
+  // TODO: 약관/개인정보 내용 로드하는거
 
-async function loadModalContent() {
-  try {
-    const [tRes, pRes] = await Promise.all([
-      await getTerms(),
-      await getPrivacyPolicy(),
-    ]);
+  signupBtn?.addEventListener('click', async () => {
+    renderMessage(formError, '', { autoHide: true });
 
-    const tText = await tRes.text();
-    const pText = await pRes.text();
+    const okEmail = validateEmail(emailInput.value(), emailError);
+    const okPassword = validatePassword(passwordInput.value(), passwordError);
+    const okPassword2 = validateReInputPassword(passwordInput.value(), password2Input.value(), password2Error);
+    const okNickname = validateNickname(nicknameInput.value(), nicknameError);
+    const okAgreements = validateAgreements(!!agreeTermsCheck.checked, !!agreePrivacyCheck.checked, agreeError);
 
-    if (termsContentEl) termsContentEl.innerHTML = tText;
-    if (privacyContentEl) privacyContentEl.innerHTML = pText;
-  } catch (e) {
-    console.error('약관/개인정보 불러오기 실패:', e);
-    if (termsContentEl) termsContentEl.textContent = '약관 내용을 불러오지 못했습니다.';
-    if (privacyContentEl) privacyContentEl.textContent = '개인정보처리방침을 불러오지 못했습니다.';
-  }
-}
-
-// 최초 1번 로드
-loadModalContent();
-
-// ===== 가입 제출 처리 =====
-submitButton?.addEventListener('click', async () => {
-  // 전체 유효성 체크
-  const okEmail = validateEmail();
-  const okPw = validatePassword();
-  const okPw2 = validateReInputPassword();
-  const okNick = validateNickname();
-  const okAgree = validateAgreements();
-
-  if (!okEmail || !okPw || !okPw2 || !okNick || !okAgree) {
-    renderUserInput(globalWarnSel, '입력값을 다시 확인해주세요.');
-    return;
-  }
-
-  const email = emailInput.value.trim();
-  const password = password1Input.value.trim();
-  const nickname = nicknameInput.value.trim();
-
-  // 프로필 파일
-  const fileInput = document.getElementById('signup-profile');
-  const file = fileInput?.files?.[0] || null;
-  const fileName = file ? file.name : '';
-
-  try {
-    const res = await signup({ email, password, nickname, fileName });
-
-    if (!res.ok) {
-      let msg = '회원가입 실패';
-      try {
-        const data = await res.json();
-        if (data?.message) msg = data.message;
-      } catch {
-        try {
-          const text = await res.text();
-          if (text) msg = text;
-        } catch {}
-      }
-      renderUserInput(globalWarnSel, msg);
+    if (!okEmail || !okPassword || !okPassword2 || !okNickname || !okAgreements) {
+      renderMessage(formError, '입력한 내용을 다시 확인해주세요.', { type: "error" });
       return;
     }
 
-    const presigned = await res.text();
+    const email = emailInput.value();
+    const password = passwordInput.value();
+    const nickname = nicknameInput.value();
+    
+    const file = profileInput?.files?.[0] || null;
+    const fileName = file ? file.name : '';
 
-    // 파일이 없거나 presigned가 빈 값이면 업로드 생략하고 바로 로그인 페이지로
-    if (!file || presigned.length === 0) {
-      window.location.href = '/login';
-      return;
-    }
+    // TODO: 회원가입 API 호출 및 presigned url 받은걸로 이미지 업로드 처리
 
-    // 파일 업로드 S3
-    try {
-      await uploadToS3(presigned, file);
-    } catch (e) {
-      console.error(e);
-      renderUserInput(globalWarnSel, '프로필 사진 업로드에 실패했어요.');
-      return;
-    }
-
-    // 성공적으로 업로드까지 끝났으면 로그인 페이지로
-    window.location.href = '/login';
-  } catch (err) {
-    console.error('회원가입 중 예외:', err);
-    renderUserInput(globalWarnSel, '네트워크 오류가 발생했어요.');
-  }
-});
+    window.router?.navigate
+    ? window.router.navigate('/login')
+    : (window.location.href = '/login');
+  })
+}

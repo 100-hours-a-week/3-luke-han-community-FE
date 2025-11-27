@@ -1,5 +1,5 @@
-const e = require("express");
-const { LoginPage, initLoginPage } = require("./public/components/login/login");
+import { LoginPage, initLoginPage } from './components/login/login.js';
+import { SignupPage, initSignupPage } from './components/signup/signup.js';
 
 const main = document.querySelector('main');
 
@@ -10,9 +10,13 @@ const routes = {
     view: LoginPage,      // 화면 그리는 함수
     init: initLoginPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
   },
-  'login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
+  '/login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
     view: LoginPage,
     init: initLoginPage,
+  },
+  '/signup': {
+    view: SignupPage,
+    init: initSignupPage,
   },
 };
 
