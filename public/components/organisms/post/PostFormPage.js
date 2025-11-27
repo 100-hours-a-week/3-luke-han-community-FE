@@ -1,7 +1,8 @@
-import { PrimaryButton } from "../../atoms/Button";
-import { TextAreaField } from "../../atoms/TextAreaField";
-import { TextField } from "../../atoms/TextField";
-import { AuthLayout } from "../../layout/AuthLayout";
+import { PrimaryButton } from "../../atoms/Button.js";
+import { TextAreaField } from "../../atoms/TextAreaField.js";
+import { TextField } from "../../atoms/TextField.js";
+import { AuthLayout } from "../../layout/AuthLayout.js";
+import { renderMessage } from "../../../utils/alerts.js";
 
 function getModeAndId(pathname = window.location.pathname) {
   const createMatch = /^\/post\/create$/.test(pathname);
@@ -94,23 +95,6 @@ export function initPostFormPage() {
   const warningEl = document.getElementById("post-form-warning");
   const submitBtn = document.getElementById("post-form-submit");
 
-  function setWarning(msg) {
-    if (!warningEl) return;
-    if (!msg) {
-      warningEl.textContent = "";
-      warningEl.hidden = true;
-    } else {
-      warningEl.textContent = msg;
-      warningEl.hidden = false;
-    }
-  }
-
-  function setFieldError(el, msg) {
-    if (!el) return;
-    el.textContent = msg || "";
-    el.hidden = !msg;
-  }
-
   async function prefillIfEdit() {
     if (isCreate || !postId) return;
 
@@ -124,25 +108,25 @@ export function initPostFormPage() {
     let valid = true;
 
     if (!title) {
-      setFieldError(titleError, "제목을 입력하세요.");
+      renderMessage(titleError, "제목을 입력하세요.");
       valid = false;
     } else {
-      setFieldError(titleError, "");
+      renderMessage(titleError, "");
     }
 
     if (!content) {
-      setFieldError(contentError, "내용을 입력하세요.");
+      renderMessage(contentError, "내용을 입력하세요.");
       valid = false;
     } else {
-      setFieldError(contentError, "");
+      renderMessage(contentError, "");
     }
 
     if (!valid) {
-      setWarning("입력한 내용을 다시 확인해주세요.");
+      renderMessage(warningEl, "입력한 내용을 다시 확인해주세요.");
       return;
     }
 
-    setWarning("");
+    renderMessage(warningEl, "");
 
     const files = imageInput?.files ? Array.from(imageInput.files) : [];
     const images = files.map((f) => f.name);
