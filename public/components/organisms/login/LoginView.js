@@ -1,0 +1,21 @@
+import { PrimaryButton } from "../../atoms/Button.js";
+import { TextField } from "../../atoms/TextField.js";
+import { AuthLayout } from "../../layout/AuthLayout.js";
+
+export function LoginPage() {
+  const body = `
+    ${TextField({ id: 'email', label: '이메일', type: 'email', errorId: 'email-error', errorText: '이메일을 입력하세요.' })}
+    ${TextField({ id: 'password', label: '비밀번호', type: 'password', errorId: 'password-error', errorText: '비밀번호를 입력하세요.' })}
+
+    <div id="form-error" class="auth-error-global" hidden></div>
+
+    ${PrimaryButton({ id: 'loginBtn', label: '로그인' })}
+
+    <div class="auth-links">
+      <a href="/forgot" class="auth-link-subtle">비밀번호 찾기</a>
+      <a href="/signup" class="auth-link-main">회원가입</a>
+    </div>
+  `;
+
+  return AuthLayout({ title: '로그인', bodyHtml: body });
+}

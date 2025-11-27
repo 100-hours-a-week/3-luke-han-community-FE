@@ -1,7 +1,13 @@
-import { LoginPage, initLoginPage } from './components/organisms/login/login.js';
-import { initMainPage, MainPage } from './components/organisms/main/MainPage.js';
-import { initPostFormPage, PostFormPage } from './components/organisms/post/PostFormPage.js';
-import { SignupPage, initSignupPage } from './components/organisms/signup/signup.js';
+import { MainPage } from './components/organisms/main/MainPageView.js';
+import { initMainPage } from './components/organisms/main/MainPageController.js';
+import { LoginPage } from './components/organisms/login/LoginView.js';
+import { initLoginPage } from './components/organisms/login/LoginController.js';
+import { SignupPage } from './components/organisms/signup/SignupView.js';
+import { initSignupPage } from './components/organisms/signup/SignupController.js';
+import { initPostFormPage } from './components/organisms/post/create-edit/PostFormController.js';
+import { PostFormPage } from './components/organisms/post/create-edit/PostFormView.js';
+import { initPostDetailPage } from './components/organisms/post/detail/PostDetailController.js';
+import { PostDetailPageView } from './components/organisms/post/detail/PostDetailView.js';
 import { isAuthenticated } from './utils/tokenStore.js';
 
 const main = document.querySelector('main');
@@ -34,6 +40,16 @@ const routes = {
 function resolveRoute(pathname) {
   if (routes[pathname]) return routes[pathname];
 
+  // 2) /post/:id (상세 페이지)
+  if (/^\/post\/\d+$/.test(pathname)) {
+    return {
+      view: PostDetailPageView,
+      init: initPostDetailPage,
+      requiresAuth: false, // 비회원도 열람 가능하게 둘 거면 false
+    };
+  }
+
+  // 3) /post/:id/edit (수정 페이지)
   if (/^\/post\/\d+\/edit$/.test(pathname)) {
     return {
       view: PostFormPage,
