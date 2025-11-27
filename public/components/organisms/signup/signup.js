@@ -1,95 +1,82 @@
-import { renderMessage } from "../../utils/alerts.js";
-import { useInput } from "../../utils/hooks.js";
-import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../utils/validator.js";
+import { renderMessage } from "../../../utils/alerts.js";
+import { useInput } from "../../../utils/hooks.js";
+import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../../utils/validator.js";
+import { AuthLayout } from "../../layout/AuthLayout.js";
+import { PrimaryButton } from "../../atoms/Button.js";
+import { TextField } from "../../atoms/TextField.js";
 
 export function SignupPage() {
-  return `
-    <div class="auth-wrapper">
+  const body = `
+    ${TextField({
+      id: "signup-email",
+      label: "이메일",
+      type: "email",
+      errorId: "signup-email-error",
+      errorText: "",
+    })}
 
-      <h1 class="auth-title">회원가입</h1>
+    ${TextField({
+      id: "signup-password",
+      label: "비밀번호",
+      type: "password",
+      errorId: "signup-password-error",
+      errorText: "",
+    })}
 
-      <div class="auth-card">
+    ${TextField({
+      id: "signup-password2",
+      label: "비밀번호 확인",
+      type: "password",
+      errorId: "signup-password2-error",
+      errorText: "",
+    })}
 
-        <!-- 이메일 -->
-        <div class="auth-field">
-          <label for="signup-email" class="auth-label">이메일</label>
-          <input id="signup-email" type="email" class="auth-input" />
-          <div id="signup-email-error" class="auth-error" hidden></div>
-        </div>
+    ${TextField({
+      id: "signup-nickname",
+      label: "닉네임",
+      type: "text",
+      errorId: "signup-nickname-error",
+      errorText: "",
+    })}
 
-        <!-- 비밀번호 -->
-        <div class="auth-field">
-          <label for="signup-password" class="auth-label">비밀번호</label>
-          <input id="signup-password" type="password" class="auth-input" />
-          <div id="signup-password-error" class="auth-error" hidden></div>
-        </div>
+    <!-- 프로필 이미지 (선택) -->
+    <div class="auth-field">
+      <label for="signup-profile" class="auth-label">프로필 이미지 (선택)</label>
+      <input id="signup-profile" type="file" class="auth-input-file" accept="image/*" />
+      <div class="auth-helper-text">이미지를 선택하지 않으면 기본 프로필로 설정됨</div>
+    </div>
 
-        <!-- 비밀번호 확인 -->
-        <div class="auth-field">
-          <label for="signup-password2" class="auth-label">비밀번호 확인</label>
-          <input id="signup-password2" type="password" class="auth-input" />
-          <div id="signup-password2-error" class="auth-error" hidden></div>
-        </div>
-
-        <!-- 닉네임 -->
-        <div class="auth-field">
-          <label for="signup-nickname" class="auth-label">닉네임</label>
-          <input id="signup-nickname" type="text" class="auth-input" />
-          <div id="signup-nickname-error" class="auth-error" hidden></div>
-        </div>
-
-        <!-- 프로필 이미지 (선택) -->
-        <div class="auth-field">
-          <label for="signup-profile" class="auth-label">프로필 이미지 (선택)</label>
-          <input id="signup-profile" type="file" class="auth-input-file" accept="image/*" />
-          <div class="auth-helper-text">이미지를 선택하지 않으면 기본 프로필로 설정됨</div>
-        </div>
-
-        <!-- 약관 동의 -->
-        <div class="auth-field auth-agree-group">
-          <div class="auth-checkbox-row">
-            <input id="agree-terms" type="checkbox" class="auth-checkbox" />
-            <label for="agree-terms" class="auth-checkbox-label">
-              이용약관 동의
-            </label>
-            <button type="button" class="auth-link-inline" id="open-terms">
-              내용 보기
-            </button>
-          </div>
-
-          <div class="auth-checkbox-row">
-            <input id="agree-privacy" type="checkbox" class="auth-checkbox" />
-            <label for="agree-privacy" class="auth-checkbox-label">
-              개인정보 처리방침 동의
-            </label>
-            <button type="button" class="auth-link-inline" id="open-privacy">
-              내용 보기
-            </button>
-          </div>
-
-          <div id="signup-agree-error" class="auth-error" hidden></div>
-        </div>
-
-        <!-- 약관 / 개인정보 모달 컨테이너 (SPA 기준, 나중에 모달로 바꿔도 됨) -->
-        <div id="terms-content" class="auth-terms-content" hidden></div>
-        <div id="privacy-content" class="auth-terms-content" hidden></div>
-
-        <!-- 서버/전역 오류 -->
-        <div id="signup-form-error" class="auth-error-global" hidden></div>
-
-        <!-- 가입 버튼 -->
-        <button id="signupBtn" class="auth-submit">회원가입</button>
-
-        <!-- 하단 링크 -->
-        <div class="auth-links">
-          <span class="auth-link-subtle">이미 계정이 있으신가요?</span>
-          <a href="/login" class="auth-link-main">로그인</a>
-        </div>
-
+    <!-- 약관 동의 -->
+    <div class="auth-field auth-agree-group">
+      <div class="auth-checkbox-row">
+        <input id="agree-terms" type="checkbox" class="auth-checkbox" />
+        <label for="agree-terms" class="auth-checkbox-label">이용약관 동의</label>
+        <button type="button" class="auth-link-inline" id="open-terms">내용 보기</button>
       </div>
 
+      <div class="auth-checkbox-row">
+        <input id="agree-privacy" type="checkbox" class="auth-checkbox" />
+        <label for="agree-privacy" class="auth-checkbox-label">개인정보 처리방침 동의</label>
+        <button type="button" class="auth-link-inline" id="open-privacy">내용 보기</button>
+      </div>
+
+      <div id="signup-agree-error" class="auth-error" hidden></div>
+    </div>
+
+    <div id="terms-content" class="auth-terms-content" hidden></div>
+    <div id="privacy-content" class="auth-terms-content" hidden></div>
+
+    <div id="signup-form-error" class="auth-error-global" hidden></div>
+
+    ${PrimaryButton({ id: "signupBtn", label: "회원가입" })}
+
+    <div class="auth-links">
+      <span class="auth-link-subtle">이미 계정이 있으신가요?</span>
+      <a href="/login" class="auth-link-main">로그인</a>
     </div>
   `;
+
+  return AuthLayout({ title: "회원가입", bodyHtml: body });
 }
 
 export function initSignupPage() {
@@ -113,6 +100,12 @@ export function initSignupPage() {
 
   const termsContentEl = document.getElementById("terms-content");
   const privacyContentEl = document.getElementById("privacy-content");
+
+  configureHeader?.({
+    title: "아무 말 대잔치",
+    showBack: false,
+    showProfile: false,
+  });
 
   emailInput.element?.addEventListener('input', () => {
     validateEmail(emailInput.value(), emailError);

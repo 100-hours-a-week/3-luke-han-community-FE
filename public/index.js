@@ -1,5 +1,5 @@
-import { LoginPage, initLoginPage } from './components/login/login.js';
-import { SignupPage, initSignupPage } from './components/signup/signup.js';
+import { LoginPage, initLoginPage } from './components/organisms/login/login.js';
+import { SignupPage, initSignupPage } from './components/organisms/signup/signup.js';
 
 const main = document.querySelector('main');
 
@@ -68,7 +68,7 @@ document.addEventListener('click', (e) => {
   const href = anchor.getAttribute('href');
 
   // 외부 링크, 해시 링크, mailto 링크 등은 SPA 라우팅에서 제외하고 기본 동작 그대로 두기
-  if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('malito:')) return;
+  if (!href || href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) return;
   // ↑ 여기 오타 있음. 'malito:' → 'mailto:'가 맞음
 
   // 여기까지 왔다는 건 내부 경로이므로,
