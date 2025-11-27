@@ -1,4 +1,5 @@
 import { LoginPage, initLoginPage } from './components/organisms/login/login.js';
+import { initMainPage, MainPage } from './components/organisms/main/MainPage.js';
 import { SignupPage, initSignupPage } from './components/organisms/signup/signup.js';
 
 const main = document.querySelector('main');
@@ -7,8 +8,8 @@ const main = document.querySelector('main');
 // URL 경로(pathname)에 따라 어떤 화면(view)과 init 함수를 쓸지 매핑해 둠
 const routes = {
   '/': {                  // 루트 경로
-    view: LoginPage,      // 화면 그리는 함수
-    init: initLoginPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
+    view: MainPage,      // 화면 그리는 함수
+    init: initMainPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
   },
   '/login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
     view: LoginPage,
@@ -25,12 +26,23 @@ function renderRoute(pathname) {
   // path에 맞는 route 객체 찾고, 없으면 '/'용 route 사용
   const route = routes[pathname] || routes['/'];
 
-  // main 영역의 HTML을 해당 view 함수가 반환하는 문자열로 교체
-  main.innerHTML = route.view();
+  // 1) 인증이 필요한 페이지인데 로그인 안 한 경우 → 로그인으로 강제 이동
+  if (targetRoute.requiresAuth && !isAuthenticated()) {
+    const loginRoute = routes['/login'];
 
-  // 화면이 새로 그려졌으니, 그 화면 전용 init 함수 호출해서
-  // 이벤트 리스너 등록, 폼 검증 등 세팅 수행
-  route.init();
+    if (window.location.pathname !== '/login') {
+      history.replaceState({}, '', '/login');
+    }
+
+    // 로그인 화면 렌더링
+    main.innerHTML = loginRoute.view();
+    loginRoute.init();
+    return;
+  }
+
+  // 2) 인증이 필요 없는 페이지거나, 토큰이 있는 경우 → 정상 렌더링
+  main.innerHTML = targetRoute.view();
+  targetRoute.init();
 }
 
 // 브라우저 뒤로가기/앞으로가기 발생할 때(popstate 이벤트)
