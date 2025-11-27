@@ -1,4 +1,4 @@
-import { renderUserInput } from "../common/common.js";
+import { renderUserInput } from "../../utils/renderUtil.js";
 
 /**
  * 게시글 카드 DOM 노드를 생성하는 컴포넌트

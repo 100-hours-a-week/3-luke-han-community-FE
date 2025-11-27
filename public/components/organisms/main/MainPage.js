@@ -1,7 +1,7 @@
-import { createPostCard, PostCardTemplate } from "../../atoms/PostCard";
-import { PostToolbar } from "../../atoms/PostToolBar";
-import { configureHeader } from "../../molecules/header/header";
-import { PostHero } from "../../molecules/main/Intro";
+import { createPostCard } from "../../atoms/PostCard.js";
+import { PostToolbar } from "../../atoms/PostToolBar.js";
+import { configureHeader } from "../../molecules/header/header.js";
+import { PostHero } from "../../molecules/main/Intro.js";
 
 export function MainPage() {
   return `

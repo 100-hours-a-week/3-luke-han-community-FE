@@ -1,5 +1,6 @@
 import { LoginPage, initLoginPage } from './components/organisms/login/login.js';
 import { initMainPage, MainPage } from './components/organisms/main/MainPage.js';
+import { initPostFormPage, PostFormPage } from './components/organisms/post/PostFormPage.js';
 import { SignupPage, initSignupPage } from './components/organisms/signup/signup.js';
 import { isAuthenticated } from './utils/tokenStore.js';
 
@@ -11,7 +12,7 @@ const routes = {
   '/': {                  // 루트 경로
     view: MainPage,      // 화면 그리는 함수
     init: initMainPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
-    requiresAuth: true,
+    requiresAuth: false,
   },
   '/login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
     view: LoginPage,
@@ -23,15 +24,34 @@ const routes = {
     init: initSignupPage,
     requiresAuth: false,
   },
+  '/post/create': {
+    view: PostFormPage,
+    init: initPostFormPage,
+    requiresAuth: false,
+  }
 };
+
+function resolveRoute(pathname) {
+  if (routes[pathname]) return routes[pathname];
+
+  if (/^\/post\/\d+\/edit$/.test(pathname)) {
+    return {
+      view: PostFormPage,
+      init: initPostFormPage,
+      requiresAuth: true,
+    };
+  }
+
+  return routes['/'];
+}
 
 // 실제로 라우트에 맞는 화면을 렌더링하는 함수
 function renderRoute(pathname) {
   // path에 맞는 route 객체 찾고, 없으면 '/'용 route 사용
-  const route = routes[pathname] || routes['/'];
+  const route = resolveRoute(pathname);
 
   // 1) 인증이 필요한 페이지인데 로그인 안 한 경우 → 로그인으로 강제 이동
-  if (targetRoute.requiresAuth && !isAuthenticated()) {
+  if (route.requiresAuth && !isAuthenticated()) {
     const loginRoute = routes['/login'];
 
     if (window.location.pathname !== '/login') {
@@ -45,8 +65,8 @@ function renderRoute(pathname) {
   }
 
   // 2) 인증이 필요 없는 페이지거나, 토큰이 있는 경우 → 정상 렌더링
-  main.innerHTML = targetRoute.view();
-  targetRoute.init();
+  main.innerHTML = route.view();
+  route.init();
 }
 
 // 브라우저 뒤로가기/앞으로가기 발생할 때(popstate 이벤트)
