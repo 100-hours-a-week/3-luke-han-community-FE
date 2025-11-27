@@ -1,6 +1,7 @@
 import { LoginPage, initLoginPage } from './components/organisms/login/login.js';
 import { initMainPage, MainPage } from './components/organisms/main/MainPage.js';
 import { SignupPage, initSignupPage } from './components/organisms/signup/signup.js';
+import { isAuthenticated } from './utils/tokenStore.js';
 
 const main = document.querySelector('main');
 
@@ -10,14 +11,17 @@ const routes = {
   '/': {                  // 루트 경로
     view: MainPage,      // 화면 그리는 함수
     init: initMainPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
+    requiresAuth: true,
   },
   '/login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
     view: LoginPage,
     init: initLoginPage,
+    requiresAuth: false,
   },
   '/signup': {
     view: SignupPage,
     init: initSignupPage,
+    requiresAuth: false,
   },
 };
 
