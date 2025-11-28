@@ -1,7 +1,7 @@
 import { renderMessage } from "../../../utils/alerts.js";
 import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../../utils/validator.js";
-import { configureHeader } from "../../../molecules/header/Header.js";
+import { configureHeader } from "../../molecules/header/header.js";
 
 export function initSignupPage() {
   const emailInput = useInput("signup-email");

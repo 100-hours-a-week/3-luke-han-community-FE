@@ -1,5 +1,5 @@
-import { PrimaryButton } from "../../../atoms/button/PrimaryButton.js";
-import { TextField } from "../../../atoms/input/TextField.js";
+import { PrimaryButton } from "../../../atoms/Button.js";
+import { TextField } from "../../../atoms/TextField.js";
 
 export function PostDetailPageView() {
   return `

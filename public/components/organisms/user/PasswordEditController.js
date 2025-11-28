@@ -1,7 +1,7 @@
-import { renderMessage } from "../../../utils/alerts";
-import { registerEnterSubmit } from "../../../utils/commonHooks";
-import { validatePassword, validateReInputPassword, validateRequired } from "../../../utils/validator";
-import { configureHeader } from "../../molecules/header/header";
+import { renderMessage } from "../../../utils/alerts.js";
+import { registerEnterSubmit } from "../../../utils/commonHooks.js";
+import { validatePassword, validateReInputPassword, validateRequired } from "../../../utils/validator.js";
+import { configureHeader } from "../../molecules/header/header.js";
 
 export function initPasswordEditPage() {
   configureHeader?.({

@@ -9,6 +9,10 @@ import { PostFormPage } from './components/organisms/post/create-edit/PostFormVi
 import { initPostDetailPage } from './components/organisms/post/detail/PostDetailController.js';
 import { PostDetailPageView } from './components/organisms/post/detail/PostDetailView.js';
 import { isAuthenticated } from './utils/tokenStore.js';
+import { UserEditPageView } from './components/organisms/user/UserEditPageView.js';
+import { initUserEditPage } from './components/organisms/user/UserEditController.js';
+import { PasswordEditPageView } from './components/organisms/user/PasswordEditPageView.js';
+import { initPasswordEditPage } from './components/organisms/user/PasswordEditController.js';
 
 const main = document.querySelector('main');
 
@@ -34,7 +38,17 @@ const routes = {
     view: PostFormPage,
     init: initPostFormPage,
     requiresAuth: false,
-  }
+  },
+  '/user/edit': {
+    view: UserEditPageView,
+    init: initUserEditPage,
+    requiresAuth: false,
+  },
+  '/user/password': {
+    view: PasswordEditPageView,
+    init: initPasswordEditPage,
+    requiresAuth: false,
+  },
 };
 
 function resolveRoute(pathname) {

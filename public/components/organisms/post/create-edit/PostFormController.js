@@ -1,4 +1,4 @@
-import { renderMessage } from "../../../../utils/alerts";
+import { renderMessage } from "../../../../utils/alerts.js";
 import { registerEnterSubmit } from "../../../../utils/commonHooks.js";
 import { configureHeader } from "../../../molecules/header/header.js";
 
