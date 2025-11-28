@@ -1,40 +1,46 @@
+import { DEFAULT_PROFILE_IMAGE_URL } from "../../../utils/cacheStore.js";
 import { renderUserInput } from "../../../utils/renderUtil.js";
 
-export function createCommentItem(wrapper) {
-  const comment = wrapper?.comment ?? {};
-  const author = wrapper?.author ?? {};
-  const children = Array.isArray(wrapper?.children) ? wrapper.children : [];
+export function createCommentItem(wrapper, { isChild = false } = {}) {
+  const commentDto = isChild ? wrapper : (wrapper?.parent ?? {});
 
   const {
     id,
-    content = '',
+    name = '',
+    profileImageUrl = DEFAULT_PROFILE_IMAGE_URL,
+    comment = '',
     createdAt = '',
-  } = comment;
+  } = commentDto;
 
-  const {
-    name: nickname = '',
-    profileImageUrl = '/assets/image/default_profile.png',
-  } = author;
+  
 
   const canEdit = !!wrapper?.canEdit;
   const canDelete = wrapper?.canDelete ?? canEdit;
   
   const root = document.createElement('div');
-  root.className = 'comment_item detail-comment-card card shadow-sm mb-3';
+  root.className = isChild
+    ? "comment_item detail-comment-card card shadow-sm mb-2 ms-4"
+    : "comment_item detail-comment-card card shadow-sm mb-3";
   if (id != null) {
     root.dataset.commentId = String(id);
   }
+
+  const hasMoreChildren = !isChild && !!wrapper?.hasMoreChildren;
+  const childNextCursor =
+    !isChild && wrapper?.childNextCursor != null
+      ? wrapper.childNextCursor
+      : "";
 
   root.innerHTML = `
     <div class="card-body">
       <div class="user_info d-flex align-items-center gap-2 flex-wrap">
         <img
           class="profile rounded-circle object-fit-cover"
-          src="${profileImageUrl || "/assets/image/default_profile.png"}"
+          src="${profileImageUrl || "/assets/image/default-profile.png"}"
           alt="profile_image"
           style="width:32px;height:32px;"
         >
-        <span class="nickname fw-semibold">${nickname}</span>
+        <span class="nickname fw-semibold">${name}</span>
         <span class="created_time text-muted small">${createdAt || ""}</span>
 
         <div class="ms-auto d-flex gap-2">
@@ -78,6 +84,10 @@ export function createCommentItem(wrapper) {
         </div>
       </div>
 
+      ${
+        isChild
+          ? ""
+          : `
       <!-- 답글 버튼 -->
       <button
         class="reply_button btn btn-sm btn-light mt-2"
@@ -108,16 +118,28 @@ export function createCommentItem(wrapper) {
           </button>
         </div>
       </div>
+      `
+      }
 
       <!-- 자식 댓글(대댓글) 영역 -->
       <div class="children_wrap mt-3"></div>
 
+      ${
+        isChild
+          ? ""
+          : `
       <button
-        class="load-more-replies btn btn-link btn-sm text-decoration-none p-0 mt-2 d-none"
+        class="load-more-replies btn btn-link btn-sm text-decoration-none p-0 mt-2 ${
+          hasMoreChildren ? "" : "d-none"
+        }"
         type="button"
+        data-parent-id="${id ?? ""}"
+        data-child-next-cursor="${childNextCursor ?? ""}"
       >
         댓글 더보기
       </button>
+      `
+      }
     </div>
   `;
 
@@ -130,10 +152,12 @@ export function createCommentItem(wrapper) {
   }
 
   const childrenWrap = root.querySelector('.children_wrap');
-  children.forEach((childWrapper) => {
-    const childNode = createCommentItem(childWrapper);
-    childrenWrap.appendChild(childNode);
-  });
+  if (!isChild && Array.isArray(wrapper?.children)) {
+    wrapper.children.forEach((childDto) => {
+      const childNode = createCommentItem(childDto, { isChild: true });
+      childrenWrap.appendChild(childNode);
+    });
+  }
 
   return root;
 }

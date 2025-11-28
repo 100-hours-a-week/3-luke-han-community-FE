@@ -1,3 +1,4 @@
+import { getPosts } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
 import { createPostCard } from "../../molecules/post/PostCard.js";
 
@@ -33,8 +34,10 @@ export function initMainPage() {
   }
 
   // 게시글 목록
-  function renderPostList(list = []) {
-    listParent.innerHTML = '';
+  function renderPostList(list = [], { append = false } = {}) {
+    if (!append) {
+      listParent.innerHTML = '';
+    }
 
     if (!list.length) {
       renderEmpty();
@@ -74,27 +77,58 @@ export function initMainPage() {
 
   let nextCursor = 0;
   let hasNextCursor = true;
+  let isLoading = false;
 
   async function loadPosts(cursor = nextCursor, size = 10) {
-    try {
-      // TODO: API 붙이기
+    if (isLoading) return;
+    isLoading = true;
 
-      renderPostList([]);
+    try {
+      const res = await getPosts(cursor, size);
+
+      if (!res.ok) {
+        console.error("[MainPage] Failed to load posts", res.status);
+
+        if (cursor === 0) {
+          renderPostList([]);
+        }
+
+        hasNextCursor = false;
+        return;
+      }
+
+      const body = await res.json();
+      const { data } = body || {};
+      const list = data?.list ?? [];
+      const next = data?.nextCursor ?? 0;
+      const hasNext = data?.hasNextCursor ?? false;
+
+      renderPostList(list, { append: cursor !== 0 });
+
+      nextCursor = next;
+      hasNextCursor = hasNext;
     } catch (error) {
       console.error("[MainPage] Failed to load posts", error);
+      
+      if (cursor === 0) {
+        renderPostList([]);
+      }
+      hasNextCursor = false;
+    } finally {
+      isLoading = false;
     }
   }
 
-  // window.addEventListener("scroll", () => {
-  //   if (!hasNextCursor) return;
-  //   const nearBottom =
-  //     window.innerHeight + window.scrollY >=
-  //     document.body.offsetHeight - 200;
-  //   if (nearBottom) {
-  //     loadPosts(nextCursor, 10);
-  //   }
-  // });
-  // => 무한스크롤용 스켈레톤 UI 추후 따로 뺄지 말지 결정
+  // 무한스크롤링
+  window.addEventListener("scroll", () => {
+    if (!hasNextCursor || isLoading) return;
+    const nearBottom =
+      window.innerHeight + window.scrollY >=
+      document.body.offsetHeight - 200;
+    if (nearBottom) {
+      loadPosts(nextCursor, 10);
+    }
+  });
 
   loadPosts();
 }

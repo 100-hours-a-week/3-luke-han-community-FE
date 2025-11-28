@@ -1,6 +1,7 @@
 import { renderMessage } from "../../../utils/alerts.js";
 import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../../utils/validator.js";
+import { getPrivacyPolicy, getTerms, signup, uploadToS3 } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
 
 export function initSignupPage() {
@@ -59,19 +60,35 @@ export function initSignupPage() {
   const openTermsBtn = document.getElementById('open-terms');
   const openPrivacyBtn = document.getElementById('open-privacy');
 
-  openTermsBtn?.addEventListener('click', () => {
+  openTermsBtn?.addEventListener('click', async () => {
     if (!termsContentEl) return;
-    // TODO: 약관 가져오기
+    
+    try {
+      const res = await getTerms();
+      const html = await res.text();
+      termsContentEl.innerHTML = html;
+      termsContentEl.dataset.loaded = 'true';
+    } catch (e) {
+      termsContentEl.innerHTML = '<p>약관을 불러오는 중 오류가 발생했습니다.</p>';
+    }
+
     termsContentEl.hidden = !termsContentEl.hidden;
   });
 
-  openPrivacyBtn?.addEventListener('click', () => {
+  openPrivacyBtn?.addEventListener('click', async () => {
     if (!privacyContentEl) return;
-    // TODO: 개인정보처리방침 가져오기
+    
+    try {
+      const res = await getPrivacyPolicy();
+      const html = await res.text();
+      privacyContentEl.innerHTML = html;
+      privacyContentEl.dataset.loaded = 'true';
+    } catch (e) {
+      privacyContentEl.innerHTML = '<p>개인정보처리방침을 불러오는 중 오류가 발생했습니다.</p>';
+    }
+    
     privacyContentEl.hidden = !privacyContentEl.hidden;
   });
-
-  // TODO: 약관/개인정보 내용 로드하는거
 
   signupBtn?.addEventListener('click', async () => {
     renderMessage(formError, '', { autoHide: true });
@@ -94,11 +111,45 @@ export function initSignupPage() {
     const file = profileInput?.files?.[0] || null;
     const fileName = file ? file.name : '';
 
-    // TODO: 회원가입 API 호출 및 presigned url 받은걸로 이미지 업로드 처리
+    try {
+      const signupRes = await signup({
+        email,
+        password,
+        nickname,
+        profileImageName: fileName,
+      });
 
-    window.router?.navigate
-    ? window.router.navigate('/login')
-    : (window.location.href = '/login');
+      if (!signupRes.ok) {
+        let msg = '회원가입 중 오류가 발생했습니다.';
+        try {
+          const errorBody = await signupRes.json();
+          if (errorBody?.message) {
+            msg = errorBody.message;
+          }
+        } catch (_) {
+          renderMessage(formError, msg, { type: "error" });
+          return;
+        }
+      }
+
+      const body = await signupRes.json();
+      const { data: presignedUrl, message } = body || {};
+
+      if (file && presignedUrl) {
+        // 프로필 이미지 업로드
+        try {
+          await uploadToS3(presignedUrl, file);
+        } catch (e) {
+          renderMessage(formError, '프로필 이미지 업로드 중 오류가 발생했습니다.', { type: "error" });
+        }
+      }
+
+      window.router?.navigate
+      ? window.router.navigate('/login')
+      : (window.location.href = '/login');
+    } catch (error) {
+      renderMessage(formError, error.message || '회원가입 중 오류가 발생했습니다.', { type: "error" });
+    }
   });
 
   registerEnterSubmit(emailInput.element, () => signupBtn?.click());

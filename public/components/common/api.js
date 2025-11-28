@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8080';
+import { authFetch } from "../../utils/apiClient";
 
 /**
  * 로그인 API
@@ -9,14 +9,13 @@ const API_BASE_URL = 'http://localhost:8080';
  * @returns 
  */
 export async function login(body) {
-  const res = await fetch(API_BASE_URL + `/api/auth/signin`, {
+  const res = await authFetch(`/api/auth/signin`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: body,
-    credentials: 'include',
-  });
+    body: JSON.stringify(body),
+  }, { skipAuth: true });
 
   return res;
 };
@@ -27,13 +26,11 @@ export async function login(body) {
  * @returns 
  */
 export async function logout() {
-  const res = await fetch(API_BASE_URL + `/api/auth/logout`, {
+  const res = await authFetch(`/api/auth/logout`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
 
   return res;
@@ -45,14 +42,14 @@ export async function logout() {
  * @param {*} email 
  * @returns 
  */
-export async function checkEmailDuplicate(email) {
-  const res = await fetch(API_BASE_URL + `/api/auth/duplications/email`, {
+export async function checkEmailDuplicate(body) {
+  const res = await authFetch(`/api/auth/duplications/email`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ email }),
-  });
+    body: JSON.stringify(body),
+  }, { skipAuth: true });
 
   return res;
 }
@@ -63,14 +60,14 @@ export async function checkEmailDuplicate(email) {
  * @param {*} nickname 
  * @returns 
  */
-export async function checkNicknameDuplicate(nickname) {
-  const res = await fetch(API_BASE_URL + `/api/auth/duplications/nickname`, {
+export async function checkNicknameDuplicate(body) {
+  const res = await authFetch(`/api/auth/duplications/nickname`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ nickname }),
-  });
+    body: JSON.stringify(body),
+  }, { skipAuth: true });
 
   return res;
 }
@@ -81,12 +78,12 @@ export async function checkNicknameDuplicate(nickname) {
  * @returns 
  */
 export async function getTerms() {
-  const res = await fetch(API_BASE_URL + `/terms`, {
+  const res = await authFetch(`/terms`, {
     method: 'GET',
     headers: {
       'Content-Type': 'text/html',
     },
-  });
+  }, { skipAuth: true });
 
   return res;
 }
@@ -97,12 +94,12 @@ export async function getTerms() {
  * @returns 
  */
 export async function getPrivacyPolicy() {
-  const res = await fetch(API_BASE_URL + `/privacy`, {
+  const res = await authFetch(`/privacy`, {
     method: 'GET',
     headers: {
       'Content-Type': 'text/html',
     },
-  });
+  }, { skipAuth: true });
 
   return res;
 }
@@ -116,14 +113,13 @@ export async function getPrivacyPolicy() {
  * @returns 
  */
 export async function signup(body) {
-  const res = await fetch(API_BASE_URL + `/api/auth/signup`, {
+  const res = await authFetch(`/api/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-    credentials: 'include',
-  });
+  }, { skipAuth: true });
 
   return res;
 };
@@ -135,14 +131,12 @@ export async function signup(body) {
  * @returns 
  */
 export async function updateUserProfile(body) {
-  const res = await fetch(API_BASE_URL + `/api/users`, {
+  const res = await authFetch(`/api/users`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify(body),
-    credentials: 'include',
   });
 
   return res;
@@ -155,14 +149,12 @@ export async function updateUserProfile(body) {
  * @returns 
  */
 export async function updateUserPassword(body) {
-  const res = await fetch(API_BASE_URL + `/api/users/password`, {
+  const res = await authFetch(`/api/users/password`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
     body: JSON.stringify(body),
-    credentials: 'include',
   });
 
   return res;
@@ -177,13 +169,11 @@ export async function updateUserPassword(body) {
  * @returns {Promise<Response>}
  */
 export async function getPosts(cursor = 0, size = 20) {
-  const res = await fetch(API_BASE_URL + `/api/posts?cursor=${cursor}&size=${size}`, {
+  const res = await authFetch(`/api/posts?cursor=${cursor}&size=${size}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
 
   return res;
@@ -193,14 +183,14 @@ export async function getPosts(cursor = 0, size = 20) {
  * 게시글 상세 조회
  */
 export async function getPostDetail(postId) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}`, {
+  const res = await authFetch(`/api/posts/${postId}`, {
     method: 'GET',
     headers: { 
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
+
+  return res
 }
 
 /**
@@ -209,83 +199,90 @@ export async function getPostDetail(postId) {
  * @param {string} content - 실제 댓글 내용
  * @param {number} parentId - 부모 댓글 id (최상위 댓글이면 0)
  */
-export async function createComment(postId, content, parentId = 0) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}/comments`, {
+export async function createComment(postId, body) {
+  const res = await authFetch(`/api/posts/${postId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body: JSON.stringify({
-      parentId: parentId,
-      content: content,
-    }),
-    credentials: 'include',
+    body: JSON.stringify(body),
   });
+
+  return res;
 }
 
 /** 
  * 댓글 목록 조회
  */
 export async function getComments(postId, { parentId = 0, cursor = 0, size = 20 } = {}) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
+  const res = await authFetch(`/api/posts/${postId}/comments?pid=${parentId}&cursor=${cursor}&size=${size}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
+
+  return res;
 }
 
 /** 게시글 생성 */
 export async function createPost(body) {
-  return fetch(API_BASE_URL + `/api/posts`, {
+  const res = await authFetch(`/api/posts`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body,
-    credentials: 'include',
+    body: JSON.stringify(body),
   });
+
+  return res
 }
 
 /** 게시글 수정 */
 export async function updatePost(postId, body) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}`, {
+  const res = await authFetch(`/api/posts/${postId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    body: body,
-    credentials: 'include',
+    body: JSON.stringify(body),
   });
+
+  return res;
 }
 
 /** 게시글 좋아요 */
 export async function likePost(postId) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}/likes`, {
+  const res = await authFetch(`/api/posts/${postId}/likes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
+
+  return res;
 }
 
 /** 좋아요 취소 */
 export async function unlikePost(postId) {
-  return fetch(API_BASE_URL + `/api/posts/${postId}/likes`, {
+  const res = await authFetch(`/api/posts/${postId}/likes`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': localStorage.getItem('accessToken') || '',
     },
-    credentials: 'include',
   });
+}
+
+/** profile image presigned url 가져오는 API */
+export async function getMyProfile() {
+  const res = await authFetch(`/api/users/images`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return res;
 }
 
 export async function uploadToS3(url, file) {

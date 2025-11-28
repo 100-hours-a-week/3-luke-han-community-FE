@@ -96,6 +96,7 @@ export function PostDetailPageView() {
         </div>
 
         <div class="comments_section"></div>
+        <div class="comments_more_container"></div>
       </section>
 
     </div>

@@ -1,6 +1,8 @@
 import { renderMessage } from "../../../../utils/alerts.js";
+import { getProfileImageUrl } from "../../../../utils/cacheStore.js";
 import { registerEnterSubmit } from "../../../../utils/commonHooks.js";
 import { renderUserInput } from "../../../../utils/renderUtil.js";
+import { createComment, getComments, getPostDetail, likePost, unlikePost } from "../../../common/api.js";
 import { createCommentItem } from "../../../molecules/comment/CommentItem.js";
 import { configureHeader } from "../../../molecules/header/header.js";
 import { closeModal, openModal } from "../../../molecules/modal/ModalController.js";
@@ -13,6 +15,13 @@ function getPostIdFromPath(pathname = window.location.pathname) {
 
 export function initPostDetailPage() {
   const postId = getPostIdFromPath();
+
+  let liked = false;
+  let likeCount = 0;
+  let commentsThreads = [];
+  let totalCommentCount = 0;
+  let parentHasNext = false;
+  let parentNextCursor = null;
 
   configureHeader?.({
     title: "아무 말 대잔치",
@@ -37,6 +46,7 @@ export function initPostDetailPage() {
   const deleteBtn = document.querySelector(".delete_button");
 
   const commentsContainer = document.querySelector(".comments_section");
+  const commentsMoreContainer = document.querySelector(".comments_more_container");
   const commentInput = document.getElementById("comment-input");
   const commentError = document.getElementById("comment-error");
   const commentSubmit = document.getElementById("comment-submit");
@@ -55,11 +65,12 @@ export function initPostDetailPage() {
       title = '',
       content = '',
       createdAt = '',
-      likeCount = 0,
+      likeCount: lc = 0,
       viewCount: vc = 0,
       commentCount: cc = 0,
       images = [],
       isMine = false,
+      liked: likedFlag = false,
     } = post;
 
     const {
@@ -74,9 +85,13 @@ export function initPostDetailPage() {
     if (createdTimeEl) createdTimeEl.textContent = createdAt || "";
     if (profileImg) profileImg.src = profileImageUrl || "/assets/image/default_profile.png";
 
-    if (likeCountEl) likeCountEl.textContent = String(likeCount ?? 0);
+    if (likeCountEl) likeCountEl.textContent = String(lc ?? 0);
     if (viewCountEl) viewCountEl.textContent = String(vc ?? 0);
     if (commentCountEl) commentCountEl.textContent = String(cc ?? 0);
+
+    liked = !!likedFlag;
+    likeCount = lc ?? 0;
+    likeBox?.classList.toggle("liked", liked);
 
     if (editBtn) editBtn.classList.toggle("d-none", !isMine);
     if (deleteBtn) deleteBtn.classList.toggle("d-none", !isMine);
@@ -101,12 +116,12 @@ export function initPostDetailPage() {
     }
   }
 
-  function renderComments(list = []) {
+  function renderComments(threads = []) {
     if (!commentsContainer) return;
 
     commentsContainer.innerHTML = "";
 
-    if (!list.length) {
+    if (!threads.length) {
       const empty = document.createElement("div");
       empty.className = "empty-state text-center text-muted py-4";
       empty.innerHTML = `
@@ -119,15 +134,105 @@ export function initPostDetailPage() {
     }
 
     const fragment = document.createDocumentFragment();
-    list.forEach((wrapper) => {
-      const node = createCommentItem(wrapper);
+    threads.forEach((thread) => {
+      const node = createCommentItem(thread);
       fragment.appendChild(node);
     });
     commentsContainer.appendChild(fragment);
   }
 
+  function renderCommentsMore() {
+    if (!commentsMoreContainer) return;
+
+    commentsMoreContainer.innerHTML = '';
+
+    if (!parentHasNext) return;
+
+    const button = document.createElement("button");
+    button.type = 'button';
+    button.className = 'detail-more-comment-btn dm-btn-ghost w-100';
+    button.textContent = '댓글 더보기';
+
+    button.addEventListener('click', handleLoadMoreParents);
+
+    commentsMoreContainer.appendChild(button);
+  }
+
+  function updateCommentsUI() {
+    renderComments(commentsThreads);
+
+    if (commentCountEl) {
+      commentCountEl.textContent = String(totalCommentCount ?? 0)
+    }
+
+    renderCommentsMore();
+  }
+
+  async function handleLoadMoreParents() {
+    if (!parentHasNext || parentNextCursor == null) return;
+
+    try {
+      const res = await getComments(postId, {
+        parentId: 0,
+        cursor: parentNextCursor,
+        size: 10,
+      });
+
+      if (!res.ok) {
+        console.error("[PostDetail] 댓글 더보기 실패", res.status);
+        return;
+      }
+
+      const body = await res.json().catch(() => null);
+      const page = body?.data;
+
+      const newParents = (page?.list ?? []).map((c) => ({
+        parent: c,
+        children: [],
+        hasMoreChildren: false,
+        childNextCursor: null,
+      }));
+
+      commentsThreads = commentsThreads.concat(newParents);
+
+      parentHasNext = !!page?.hasNextCursor;
+      parentNextCursor = page?.nextCursor ?? null;
+
+      updateCommentsUI();
+    } catch (error) {
+      console.error("[PostDetail] 댓글 더보기 렌더링 실패", error);
+    }
+  }
+
   likeBox?.addEventListener('click', async () => {
-    // TODO: 좋아요 API 호출 및 UI 업데이트
+    if (!postId) return;
+
+    try {
+      if (liked) {
+        const res = await unlikePost(postId);
+        if (!res.ok) {
+          console.error("[PostDetail] unlikePost failed", res.status);
+          return;
+        }
+
+        liked = false;
+        likeCount = Math.max(0, likeCount - 1);
+      } else {
+        const res = await likePost(postId);
+        if (!res.ok) {
+          console.error("[PostDetail] likePost failed", res.status);
+          return;
+        }
+
+        liked = true;
+        likeCount += 1;
+      }
+
+      if (likeCountEl) likeCountEl.textContent = String(likeCount);
+      likeBox.classList.toggle("liked", liked);
+    } catch (error) {
+      console.error("[PostDetail] 좋아요 토글 실패", error);
+    }
   });
 
   editBtn?.addEventListener('click', () => {
@@ -177,7 +282,54 @@ export function initPostDetailPage() {
 
     renderMessage(commentError, "", { autoHide: true });
 
-    // TODO: 댓글 등록 API 호출 및 UI 업데이트
+    try {
+      const body = {
+        parentId: 0,
+        content: value
+      };
+
+      const res = await createComment(postId, body);
+      if (!res.ok) {
+        console.error("[PostDetail] 댓글 등록 실패", res.status);
+        renderMessage(commentError, "댓글 등록에 실패했습니다.", { type: 'error' });
+        return;
+      }
+
+      const resBody = await res.json().catch(() => null);
+      const newCommentId = resBody?.data ?? null;
+
+      commentInput.value = '';
+
+      const userId = Number(localStorage.getItem("userId") || 0);
+      const nickname = localStorage.getItem("nickname") || "";
+      const profileImageUrl = getProfileImageUrl();
+
+      const time = new Date().toISOString();
+
+      const newParent = {
+        id: newCommentId,
+        userId,
+        name: nickname,
+        profileImageUrl,
+        comment: value,
+        parentId: 0,
+        depth: 0,
+        createdAt: time,
+      };
+
+      const newThread = {
+        parent: newParent,
+        children: [],
+        hasMoreChildren: false,
+        childNextCursor: null,
+      };
+
+      commentsThreads.push(newThread);
+      totalCommentCount += 1;
+      updateCommentsUI();
+    } catch (error) {
+      console.error("[PostDetail] cannot create comment message.", error);
+    }
   });
 
   registerEnterSubmit(commentInput, () => commentSubmit?.click());
@@ -232,10 +384,61 @@ export function initPostDetailPage() {
         return;
       }
 
-      // TODO: 댓글 생성 API 호출;
-      // 성공 시: replyWrap 닫고 입력값 비우고, children_wrap에 새 comment append or 목록 재조회
-      replyWrap.classList.add("d-none");
-      replyInput.value = "";
+      (async () => {
+        try {
+          const body = {
+            parentId: Number(commentId),
+            content: value,
+          };
+
+          const res = await createComment(postId, body);
+          if (!res.ok) {
+            console.error("[PostDetail] failed createReply", res.status);
+            return;
+          }
+
+          const resBody = await res.json().catch(() => null);
+          const newCommentId = resBody?.data ?? null;
+
+          replyWrap.classList.add("d-none");
+          replyInput.value = "";
+
+          const userId = Number(localStorage.getItem('userId') || 0);
+          const nickname = localStorage.getItem('nickname') || '';
+          const profileImageUrl = getProfileImageUrl();
+          const time = new Date().toISOString();
+
+          const newChild = {
+            id: newCommentId,
+            userId,
+            name: nickname,
+            profileImageUrl,
+            comment: value,
+            parentId: Number(commentId),
+            depth: 1,
+            createdAt: time,
+          };
+
+          const parentIdNum = Number(commentId);
+          const thread = commentsThreads.find(
+            (t) => t.parent && Number(t.parent.id) === parentIdNum
+          );
+
+          if (thread) {
+            if (!Array.isArray(thread.children)) {
+              thread.children = [];
+            }
+
+            thread.children.push(newChild);
+          }
+
+          totalCommentCount += 1;
+          updateCommentsUI();
+        } catch (error) {
+          console.error("[PostDetail] failed createReply by error", error);
+        }
+      }) ();
+
       return;
     }
 
@@ -318,28 +521,39 @@ export function initPostDetailPage() {
   });
 
   async function loadPostDetail() {
-    // TODO: 게시글 상세 API 호출
     try {
-      const dummy = {
-        post: {
-          title: "제목 로딩 예시",
-          content: "여기에는 게시글 본문 내용이 들어갑니다.",
-          createdAt: "방금 전",
-          likeCount: 3,
-          viewCount: 42,
-          commentCount: 0,
-          images: [],
-          isMine: true,
-        },
-        author: {
-          name: "테스트 유저",
-          profileImageUrl: "/assets/image/default_profile.png",
-        },
-        comments: [],
-      };
+      const res = await getPostDetail(postId);
+      if (!res.ok) {
+        console.error("[PostDetail] failed to load post detail", res.status);
+        
+        if (window.router?.navigate) {
+          window.router.navigate('/');
+        } else {
+          window.location.href = '/';
+        }
+      }
 
-      renderPostDetail(dummy);
-      renderComments(dummy.comments);
+      const body = await res.json();
+      const { data } = body || {};
+
+      if (!data) {
+        if (window.router?.navigate) {
+          window.router.navigate('/');
+        } else {
+          window.location.href = '/';
+        }
+      }
+
+      renderPostDetail(data);
+
+      const commentPage = data.comments;
+
+      commentsThreads = commentPage?.list ?? [];
+      parentHasNext = !!commentPage?.hasNextCursor;
+      parentNextCursor = commentPage?.nextCursor ?? null;
+
+      totalCommentCount = data.post?.commentCount ?? 0;
+      updateCommentsUI();
     } catch (e) {
       console.error("[PostDetail] load 실패", e);
       // TODO: 전역 에러 DOM 두고 renderMessage로 노출

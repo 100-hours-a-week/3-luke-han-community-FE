@@ -1,6 +1,8 @@
 import { renderMessage } from "../../../utils/alerts.js";
+import { DEFAULT_PROFILE_IMAGE_URL, setProfileImageUrl } from "../../../utils/cacheStore.js";
 import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateEmail, validatePassword } from "../../../utils/validator.js";
+import { login } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
 
 export function initLoginPage() {
@@ -36,7 +38,31 @@ export function initLoginPage() {
       return;
     }
 
-    // TODO: 로그인 API 호출
+    let res;
+    try {
+      res = await login({
+        email: emailInput.value(),
+        password: passwordInput.value(),
+      });
+    } catch (error) {
+      renderMessage(formError, error.message || '로그인 중 오류가 발생했습니다.');
+      return;
+    }
+
+    if (res.ok) {
+      const body = await res.json();
+      const { data } = body || {};
+
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('nickname', data.nickname);
+      
+      const profileUrl = data.profileImageUrl || DEFAULT_PROFILE_IMAGE_URL;
+      setProfileImageUrl(profileUrl);
+
+      window.location.href = '/';
+    } else {
+      window.location.href='/login';
+    }
   });
 
   registerEnterSubmit(emailInput.element, () => loginBtn?.click());
