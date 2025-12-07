@@ -62,6 +62,7 @@ export function initLoginPage() {
       
 
       localStorage.setItem('userId', data.userId);
+      localStorage.setItem('email', data.email);
       localStorage.setItem('nickname', data.nickname);
       
       const profileUrl = data.profileImageUrl || DEFAULT_PROFILE_IMAGE_URL;
