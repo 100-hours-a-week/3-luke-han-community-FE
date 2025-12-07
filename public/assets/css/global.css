@@ -1,0 +1,27 @@
+.msg-error {
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.msg-warn {
+  color: #d97706;
+  font-size: 13px;
+}
+
+.msg-info {
+  color: var(--text-sub);
+  font-size: 13px;
+}
+
+.msg-success {
+  color: #10b981;
+  font-size: 13px;
+}
+
+.msg-error,
+.msg-warn,
+.msg-info,
+.msg-success {
+  margin-top: 4px;
+  transition: opacity 0.15s ease;
+}

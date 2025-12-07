@@ -1,0 +1,181 @@
+/* ===========================
+ * 공통: Auth 페이지 확장 스타일
+ * (비밀번호 변경 / 회원정보 수정 둘 다 사용)
+ * =========================== */
+
+/* 섹션 구분용 구분선 (비밀번호 변경 페이지) */
+.auth-divider {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 16px 0 20px;
+}
+
+/* 페이지 상단 설명 등 있을 때 살짝 여백 조정하고 싶을 때 사용 가능 */
+.auth-page-description {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+/* 전역 에러 메시지 (이미 auth-error-global 클래스로 쓰고 있을 것 같아서 약간만 조정) */
+.auth-error-global {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #b91c1c;
+  line-height: 1.4;
+}
+
+/* 링크 구역 */
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.auth-link-subtle {
+  color: #9ca3af;
+}
+
+.auth-link-main {
+  font-weight: 600;
+  color: #111827;
+  text-decoration: none;
+}
+
+.auth-link-main:hover {
+  text-decoration: underline;
+}
+
+/* ===========================
+ * 회원정보 수정: 프로필 영역
+ * =========================== */
+
+.auth-profile-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 프로필 사진/파일 인풋 줄 */
+.auth-profile-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* 프로필 이미지 프리뷰 */
+.auth-profile-preview {
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  background-color: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+/* 파일 인풋 컨테이너 */
+.auth-profile-file {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* 파일 인풋 자체 (기존 auth-input과 톤 맞춤) */
+.auth-input-file {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background-color: #f9fafb;
+}
+
+.auth-input-file:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 1px #1118270d;
+}
+
+/* 작은 설명 텍스트 */
+.auth-helper-text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* 이메일 표시 (읽기 전용) */
+.auth-plaintext {
+  min-height: 40px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* 닉네임 줄: 인풋 + 버튼 */
+.auth-nickname-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 중복확인 버튼 (서브 액션) */
+.auth-sub-btn {
+  flex: 0 0 auto;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.auth-sub-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+}
+
+.auth-sub-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 필수 표시 별 */
+.auth-label-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* ===========================
+ * 로그아웃 버튼
+ * =========================== */
+
+.auth-secondary-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-secondary-btn:hover {
+  background-color: #f9fafb;
+}
+
+/* 로그아웃용 변형 (위험 액션) */
+.auth-logout-btn {
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.auth-logout-btn:hover {
+  background-color: #fef2f2;
+}
