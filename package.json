@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_ENV=development node server.js",
+    "start": "NODE_ENV=production node server.js"
   },
   "keywords": [],
   "author": "",
@@ -11,7 +12,8 @@
   "description": "",
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "http-proxy-middleware": "^3.0.5"
   },
   "devDependencies": {
     "postcss-cli": "^11.0.1"

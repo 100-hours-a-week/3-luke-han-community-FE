@@ -1,4 +1,4 @@
-import { authFetch } from "../../utils/apiClient";
+import { authFetch } from "../../utils/apiClient.js";
 
 /**
  * 로그인 API
@@ -9,7 +9,7 @@ import { authFetch } from "../../utils/apiClient";
  * @returns 
  */
 export async function login(body) {
-  const res = await authFetch(`/api/auth/signin`, {
+  const res = await authFetch(`/api/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -271,11 +271,13 @@ export async function unlikePost(postId) {
       'Content-Type': 'application/json',
     },
   });
+
+  return res;
 }
 
 /** profile image presigned url 가져오는 API */
 export async function getMyProfile() {
-  const res = await authFetch(`/api/users/images`, {
+  const res = await authFetch(`/api/s3`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -298,6 +300,55 @@ export async function uploadToS3(url, file) {
     const text = await res.text().catch(() => '');
     throw new Error(`S3 업로드 실패: ${res.status} ${text}`);
   }
+
+  return res;
+}
+
+/** 댓글 수정 API */
+export async function updateComment(postId, commentId, value) {
+  const res = await authFetch(`/api/posts/${postId}/comments/${commentId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ value }),  // ValueDto { value }
+  });
+
+  return res;
+}
+
+/** 댓글 삭제 API (soft delete) */
+export async function deleteComment(postId, commentId) {
+  const res = await authFetch(`/api/posts/${postId}/comments/${commentId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return res;
+}
+
+/** 게시글 삭제 API (soft delete) */
+export async function deletePost(postId) {
+  const res = await authFetch(`/api/posts/${postId}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return res;
+}
+
+/** 유저 프로필 정보 가져오는 API */
+export async function getProfileInfo() {
+  const res = await authFetch(`/api/users/images`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 
   return res;
 }

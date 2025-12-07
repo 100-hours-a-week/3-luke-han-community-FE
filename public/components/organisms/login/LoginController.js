@@ -1,6 +1,7 @@
 import { renderMessage } from "../../../utils/alerts.js";
 import { DEFAULT_PROFILE_IMAGE_URL, setProfileImageUrl } from "../../../utils/cacheStore.js";
 import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
+import { setAccessToken } from "../../../utils/tokenStore.js";
 import { validateEmail, validatePassword } from "../../../utils/validator.js";
 import { login } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
@@ -15,7 +16,7 @@ export function initLoginPage() {
   const formError = document.getElementById('form-error');
 
   configureHeader?.({
-    title: "아무 말 대잔치",
+    title: "Damul Board",
     showBack: false,
     showProfile: false,
   });
@@ -50,8 +51,15 @@ export function initLoginPage() {
     }
 
     if (res.ok) {
+      const authHeader = res.headers.get("Authorization");
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        const token = authHeader.slice(7);
+        setAccessToken(token);
+      }
+
       const body = await res.json();
       const { data } = body || {};
+      
 
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('nickname', data.nickname);
@@ -59,7 +67,7 @@ export function initLoginPage() {
       const profileUrl = data.profileImageUrl || DEFAULT_PROFILE_IMAGE_URL;
       setProfileImageUrl(profileUrl);
 
-      window.location.href = '/';
+      window.router.navigate('/');
     } else {
       window.location.href='/login';
     }

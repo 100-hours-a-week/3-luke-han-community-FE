@@ -149,8 +149,8 @@
 
 /* 이미지 리스트 */
 .post-detail-images {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -159,10 +159,10 @@
 }
 
 .post-detail-image-card {
-  border-radius: 16px;
-  overflow: hidden;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
 }
 
 .post-detail-image-card img {
@@ -393,11 +393,30 @@
     font-size: 24px;
   }
 
-  .post-detail-images {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .detail-comment-card .card-body {
     padding: 12px 14px;
   }
+}
+
+/* 좋아요가 눌린(ON) 상태 */
+.detail-like-box.liked {
+  border-color: #ef4444;
+  background-color: #fee2e2;
+  box-shadow: 0 6px 12px rgba(248, 113, 113, 0.18);
+  transform: translateY(0);
+}
+
+/* liked 상태에서 hover */
+.detail-like-box.liked:hover {
+  background-color: #fecaca;
+  border-color: #dc2626;
+}
+
+/* liked 상태에서 라벨/값 색상 강화 */
+.detail-like-box.liked .detail-stat-label {
+  color: #b91c1c;
+}
+
+.detail-like-box.liked .detail-stat-value {
+  color: #b91c1c;
 }

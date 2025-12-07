@@ -12,10 +12,12 @@ export function initMainPage() {
   }
 
   configureHeader?.({
-    title: "아무 말 대잔치",
+    title: "Damul Board",
     showBack: false,
     showProfile: true,
   });
+
+  let hasAnyPostRendered = false;
 
   // 게시글 없을 때
   function renderEmpty() {
@@ -40,7 +42,9 @@ export function initMainPage() {
     }
 
     if (!list.length) {
-      renderEmpty();
+      if (!hasAnyPostRendered) {
+        renderEmpty();
+      }
       return;
     }
 
@@ -52,6 +56,8 @@ export function initMainPage() {
     });
 
     listParent.appendChild(fragment);
+
+    hasAnyPostRendered = true;
   }
 
   listParent.addEventListener('click', (e) => {
@@ -80,7 +86,7 @@ export function initMainPage() {
   let isLoading = false;
 
   async function loadPosts(cursor = nextCursor, size = 10) {
-    if (isLoading) return;
+    if (isLoading || !hasNextCursor) return;
     isLoading = true;
 
     try {
@@ -89,8 +95,8 @@ export function initMainPage() {
       if (!res.ok) {
         console.error("[MainPage] Failed to load posts", res.status);
 
-        if (cursor === 0) {
-          renderPostList([]);
+        if (!hasAnyPostRendered) {
+          renderEmpty();
         }
 
         hasNextCursor = false;
@@ -100,18 +106,18 @@ export function initMainPage() {
       const body = await res.json();
       const { data } = body || {};
       const list = data?.list ?? [];
-      const next = data?.nextCursor ?? 0;
+      const next = data?.nextCursor ?? null;
       const hasNext = data?.hasNextCursor ?? false;
 
       renderPostList(list, { append: cursor !== 0 });
 
-      nextCursor = next;
+      nextCursor = next ?? 0;
       hasNextCursor = hasNext;
     } catch (error) {
       console.error("[MainPage] Failed to load posts", error);
       
-      if (cursor === 0) {
-        renderPostList([]);
+      if (!hasAnyPostRendered) {
+        renderEmpty();
       }
       hasNextCursor = false;
     } finally {

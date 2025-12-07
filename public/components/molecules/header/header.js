@@ -1,4 +1,4 @@
-import { getProfileImageUrl } from "../../../utils/cacheStore";
+import { getProfileImageUrl } from "../../../utils/cacheStore.js";
 
 let headerInitialized = false;
 
@@ -25,12 +25,19 @@ export async function configureHeader(options = {}) {
     backButton.hidden = !showBack;
   }
 
+  if (!showProfile) {
+    if (profileButton) profileButton.hidden = true;
+    if (profileImage) {
+      profileImage.src = '/assets/image/default_profile.png';
+    }
+    return;
+  }
+
   if (profileButton) {
-    profileButton.hidden = !showProfile;
+    profileButton.hidden = false;
   }
 
   if (profileImage) {
-    // TODO: presigned url 받아오는 API 호출
     profileImage.src = '/assets/image/default_profile.png';
 
     try {
@@ -43,18 +50,31 @@ export async function configureHeader(options = {}) {
     }
   }
 
-  if (!headerInitialized && profileButton) {
+  if (!headerInitialized) {
     headerInitialized = true;
 
-    profileButton.addEventListener('click', () => {
-      const path = '/user/edit';
+    if (profileButton) {
+      profileButton.addEventListener('click', () => {
+        const path = '/user/edit';
+        if (window.router?.navigate) {
+          window.router.navigate(path);
+        } else {
+          window.location.href = path;
+        }
+      });
+    }
 
-      if (window.router?.navigate) {
-        window.router.navigate(path);
-      } else {
-        window.location.href = path;
-      }
-    });
+    if (titleElement) {
+      titleElement.style.cursor = 'pointer';
+      titleElement.addEventListener('click', () => {
+        const path = '/';
+        if (window.router?.navigate) {
+          window.router.navigate(path);
+        } else {
+          window.location.href = path;
+        }
+      });
+    }
   }
 }
 

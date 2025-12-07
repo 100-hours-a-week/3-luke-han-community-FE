@@ -19,7 +19,7 @@ export function createPostCard(wrapper) {
 
   const {
     name: nickname = "",
-    profileImageUrl = "/assets/image/default_profile.png",
+    profileImageKey = "/assets/image/default_profile.png",
   } = author;
 
   // 카드 컨테이너
@@ -73,7 +73,7 @@ export function createPostCard(wrapper) {
   if (nickEl) nickEl.textContent = nickname ?? "";
 
   const profEl = card.querySelector("img.profile");
-  if (profEl) profEl.src = profileImageUrl || "/assets/image/default_profile.png";
+  if (profEl) profEl.src = profileImageKey || "/assets/image/default_profile.png";
 
   return card;
 }

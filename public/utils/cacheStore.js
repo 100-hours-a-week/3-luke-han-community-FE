@@ -1,6 +1,6 @@
-import { getMyProfile } from "../components/common/api";
+import { getMyProfile } from "../components/common/api.js";
 
-export const DEFAULT_PROFILE_IMAGE_URL = '/assets/image/default-profile.png';
+export const DEFAULT_PROFILE_IMAGE_URL = '/assets/image/default_profile.png';
 
 let cachedUrl = null;
 let cachedExpireAt = 0;
@@ -25,7 +25,7 @@ export function setProfileImageUrl(presignedUrl, ttlMs = 1000 * 60 * 20) {
     expireAt = Number.POSITIVE_INFINITY;
   }
 
-  cachedExpireAt = expiredAt;
+  cachedExpireAt = expireAt;
 
   // 유저가 새로고침해도 가져올 수 있게
   localStorage.setItem('profileImageUrl', presignedUrl);
@@ -62,7 +62,9 @@ export async function getProfileImageUrl() {
   try {
     const res = await getMyProfile();
     const { data } = await res.json();
-    const url = data?.profileImageUrl || DEFAULT_PROFILE_IMAGE_URL;
+    const url = (typeof data === 'string' && data.length > 0) 
+      ? data 
+      : DEFAULT_PROFILE_IMAGE_URL;
 
     setProfileImageUrl(url);
     return url;
@@ -70,5 +72,15 @@ export async function getProfileImageUrl() {
     cachedUrl = DEFAULT_PROFILE_IMAGE_URL;
     cachedExpireAt = Number.POSITIVE_INFINITY;
     return cachedUrl;
+  }
+}
+
+export function clearProfileImageCache() {
+  cachedUrl = null;
+  cachedExpireAt = 0;
+  try {
+    localStorage.removeItem('profileImageUrl');
+  } catch (e) {
+    console.error('[cacheStore] clearProfileImageCache 실패', e);
   }
 }

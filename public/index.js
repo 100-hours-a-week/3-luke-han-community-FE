@@ -8,11 +8,11 @@ import { initPostFormPage } from './components/organisms/post/create-edit/PostFo
 import { PostFormPage } from './components/organisms/post/create-edit/PostFormView.js';
 import { initPostDetailPage } from './components/organisms/post/detail/PostDetailController.js';
 import { PostDetailPageView } from './components/organisms/post/detail/PostDetailView.js';
-import { isAuthenticated } from './utils/tokenStore.js';
 import { UserEditPageView } from './components/organisms/user/UserEditPageView.js';
 import { initUserEditPage } from './components/organisms/user/UserEditController.js';
 import { PasswordEditPageView } from './components/organisms/user/PasswordEditPageView.js';
 import { initPasswordEditPage } from './components/organisms/user/PasswordEditController.js';
+import { Modal } from './components/molecules/modal/Modal.js';
 
 const main = document.querySelector('main');
 
@@ -22,7 +22,7 @@ const routes = {
   '/': {                  // 루트 경로
     view: MainPage,      // 화면 그리는 함수
     init: initMainPage,  // 해당 화면에서 이벤트 바인딩 등 초기화하는 함수
-    requiresAuth: false,
+    requiresAuth: true,
   },
   '/login': {              // "/login" 경로로 쓰고 싶으면 key를 '/login'으로 두는 게 더 자연스러움
     view: LoginPage,
@@ -37,17 +37,17 @@ const routes = {
   '/post/create': {
     view: PostFormPage,
     init: initPostFormPage,
-    requiresAuth: false,
+    requiresAuth: true,
   },
   '/user/edit': {
     view: UserEditPageView,
     init: initUserEditPage,
-    requiresAuth: false,
+    requiresAuth: true,
   },
   '/user/password': {
     view: PasswordEditPageView,
     init: initPasswordEditPage,
-    requiresAuth: false,
+    requiresAuth: true,
   },
 };
 
@@ -59,7 +59,7 @@ function resolveRoute(pathname) {
     return {
       view: PostDetailPageView,
       init: initPostDetailPage,
-      requiresAuth: false, // 비회원도 열람 가능하게 둘 거면 false
+      requiresAuth: true, // 비회원도 열람 가능하게 둘 거면 false
     };
   }
 
@@ -80,21 +80,6 @@ function renderRoute(pathname) {
   // path에 맞는 route 객체 찾고, 없으면 '/'용 route 사용
   const route = resolveRoute(pathname);
 
-  // 1) 인증이 필요한 페이지인데 로그인 안 한 경우 → 로그인으로 강제 이동
-  if (route.requiresAuth && !isAuthenticated()) {
-    const loginRoute = routes['/login'];
-
-    if (window.location.pathname !== '/login') {
-      history.replaceState({}, '', '/login');
-    }
-
-    // 로그인 화면 렌더링
-    main.innerHTML = loginRoute.view();
-    loginRoute.init();
-    return;
-  }
-
-  // 2) 인증이 필요 없는 페이지거나, 토큰이 있는 경우 → 정상 렌더링
   main.innerHTML = route.view();
   route.init();
 }
@@ -148,5 +133,13 @@ document.addEventListener('click', (e) => {
 // 페이지가 처음 로드될 때
 // 현재 URL(pathname)에 맞는 화면을 한 번 렌더링해줌
 document.addEventListener('DOMContentLoaded', () => {
+  let modalEl = document.getElementById('dm-modal');
+  if (!modalEl) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = Modal().trim();
+    modalEl = wrapper.firstElementChild;
+    document.body.appendChild(modalEl);
+  }
+
   renderRoute(window.location.pathname);
 });

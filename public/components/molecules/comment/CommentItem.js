@@ -6,16 +6,18 @@ export function createCommentItem(wrapper, { isChild = false } = {}) {
 
   const {
     id,
+    userId,
     name = '',
     profileImageUrl = DEFAULT_PROFILE_IMAGE_URL,
     comment = '',
     createdAt = '',
   } = commentDto;
 
-  
+  const currentUserId = Number(localStorage.getItem("userId") || 0);
+  const isMine = userId != null && !Number.isNaN(currentUserId) && Number(userId) === currentUserId;
 
-  const canEdit = !!wrapper?.canEdit;
-  const canDelete = wrapper?.canDelete ?? canEdit;
+  const canEdit = isMine;
+  const canDelete = isMine;
   
   const root = document.createElement('div');
   root.className = isChild
@@ -36,7 +38,7 @@ export function createCommentItem(wrapper, { isChild = false } = {}) {
       <div class="user_info d-flex align-items-center gap-2 flex-wrap">
         <img
           class="profile rounded-circle object-fit-cover"
-          src="${profileImageUrl || "/assets/image/default-profile.png"}"
+          src="${profileImageUrl || "/assets/image/default_profile.png"}"
           alt="profile_image"
           style="width:32px;height:32px;"
         >
@@ -144,11 +146,11 @@ export function createCommentItem(wrapper, { isChild = false } = {}) {
   `;
 
   const contentEl = root.querySelector('.comment_content');
-  renderUserInput(contentEl, content);
+  renderUserInput(contentEl, comment);
 
   const editInput = root.querySelector('.comment-edit-input');
   if (editInput) {
-    editInput.value = content;
+    editInput.value = comment;
   }
 
   const childrenWrap = root.querySelector('.children_wrap');

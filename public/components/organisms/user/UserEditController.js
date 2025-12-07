@@ -1,10 +1,18 @@
 import { renderMessage } from "../../../utils/alerts.js";
 import { validateNickname } from "../../../utils/validator.js";
 import { configureHeader } from "../../molecules/header/header.js";
+import {
+  checkNicknameDuplicate,
+  updateUserProfile,
+  uploadToS3,
+  logout,
+  getProfileInfo,
+} from "../../common/api.js";
+import { clearProfileImageCache } from "../../../utils/cacheStore.js";
 
 export function initUserEditPage() {
   configureHeader?.({
-    title: "아무 말 대잔치",
+    title: "Damul Board",
     showBack: true,
     showProfile: true,
   });
@@ -25,16 +33,31 @@ export function initUserEditPage() {
   const formWarnEl = document.getElementById("form-warning");
 
   const userId = Number(localStorage.getItem("userId")) || 0;
-  // TODO: API 호출해서 유저 정보 가져오기
-  let currentEmail = 'test@test.com';
-  let currentNickname = '테스트유저';
-  let currentProfileImageUrl = '/assets/image/default_profile.png';
+
+  let currentEmail = localStorage.getItem("email") || "";
+  let currentNickname = localStorage.getItem("nickname") || "";
+  let currentProfileImageUrl = "/assets/image/default_profile.png";
 
   let pendingProfileFile = null;
-  let nicknameChekcedOk = true; // 중복 통과 여부
+  let nicknameCheckedOk = true; // 중복 통과 여부
 
   // 초기 데이터 세팅
-  function hydrateInitialValues() {
+  async function hydrateInitialValues() {
+    try {
+      const res = await getProfileInfo();
+      if (res.ok) {
+        const body = await res.json().catch(() => null);
+        const url = body?.data ?? null;
+        if (url) {
+          currentProfileImageUrl = url;
+        }
+      } else {
+        console.warn("[UserEdit] 프로필 이미지 조회 실패", res.status);
+      }
+    } catch (e) {
+      console.error("[UserEdit] 프로필 이미지 조회 중 오류", e);
+    }
+
     if (emailDisplayEl) {
       emailDisplayEl.textContent = currentEmail || '';
     }
@@ -47,7 +70,7 @@ export function initUserEditPage() {
       profilePreviewEl.src = currentProfileImageUrl || '/assets/image/default_profile.png';
     }
 
-    nicknameChekcedOk = true;
+    nicknameCheckedOk = true;
 
     if (!nicknameInput?.value.trim()) {
       nicknameCheckButton?.setAttribute('disabled', 'true');
@@ -84,7 +107,7 @@ export function initUserEditPage() {
   nicknameInput?.addEventListener('input', () => {
     const nick = nicknameInput?.value ?? '';
 
-    nicknameChekcedOk = nick.trim() === currentNickname.trim();
+    nicknameCheckedOk = nick.trim() === currentNickname.trim();
 
     validateNickname(nick, nicknameWarnEl);
 
@@ -100,24 +123,53 @@ export function initUserEditPage() {
     const trimmed = nick.trim();
 
     if (!validateNickname(trimmed, nicknameWarnEl)) {
-      nicknameChekcedOk = false;
+      nicknameCheckedOk = false;
       return;
     }
 
     if (trimmed === currentNickname.trim()) {
       renderMessage(nicknameWarnEl, '현재 닉네임과 동일합니다.', { type: 'info', autoHide: true });
-      nicknameChekcedOk = true;
+      nicknameCheckedOk = true;
       return;
     }
 
-    // TODO: 닉네임 중복 확인 API 호출
+    try {
+      const res = await checkNicknameDuplicate({ value: trimmed });
 
-    renderMessage(
-      nicknameWarnEl,
-      '닉네임 중복확인 완료: 사용 가능한 닉네임입니다.',
-      { type: 'success', autoHide: true }
-    );
-    nicknameChekcedOk = true;
+      if (res.status === 204) {
+        // 사용 가능
+        renderMessage(
+          nicknameWarnEl,
+          "닉네임 중복확인 완료: 사용 가능한 닉네임입니다.",
+          { type: "success", autoHide: true }
+        );
+        nicknameCheckedOk = true;
+      } else if (res.status === 409) {
+        // 중복
+        renderMessage(
+          nicknameWarnEl,
+          "이미 사용 중인 닉네임입니다.",
+          { type: "error" }
+        );
+        nicknameCheckedOk = false;
+      } else {
+        console.error("[UserEdit] 닉네임 중복 확인 예상치 못한 응답", res.status);
+        renderMessage(
+          nicknameWarnEl,
+          "닉네임 중복 확인 중 오류가 발생했습니다.",
+          { type: "error" }
+        );
+        nicknameCheckedOk = false;
+      }
+    } catch (err) {
+      console.error("[UserEdit] 닉네임 중복 확인 실패", err);
+      renderMessage(
+        nicknameWarnEl,
+        "닉네임 중복 확인 중 오류가 발생했습니다.",
+        { type: "error" }
+      );
+      nicknameCheckedOk = false;
+    }
   });
 
   submitButton?.addEventListener('click', async () => {
@@ -137,17 +189,107 @@ export function initUserEditPage() {
       return;
     }
 
-    if (newNick !== currentNickname && !nicknameChekcedOk) {
+    if (newNick !== currentNickname && !nicknameCheckedOk) {
       renderMessage(formWarnEl, '닉네임 중복확인을 해주세요.', { type: 'error' });
       return;
     }
 
-    // TOOD: 회원정보 수정 API 호출
+    try {
+      // 1) /api/users 로 SimpUserInfo 전송 → presigned URL 응답
+      const requestBody = {
+        id: userId,
+        name: newNick,
+        profileImageKey: fileObj ? fileObj.name : null, // 파일 있으면 파일명, 아니면 null
+      };
+
+      const res = await updateUserProfile(requestBody);
+      if (!res.ok) {
+        console.error("[UserEdit] 회원정보 수정 실패", res.status);
+        renderMessage(
+          formWarnEl,
+          "회원정보 수정에 실패했습니다. 잠시 후 다시 시도해주세요.",
+          { type: "error" }
+        );
+        return;
+      }
+
+      const resBody = await res.json().catch(() => null);
+      const presignedUrl = resBody?.data ?? null;
+
+      // 2) 프로필 이미지 파일이 있고, presigned URL이 내려왔으면 S3에 업로드
+      if (presignedUrl && fileObj) {
+        try {
+          await uploadToS3(presignedUrl, fileObj);
+        } catch (e) {
+          console.error("[UserEdit] 프로필 이미지 업로드 실패", e);
+          renderMessage(
+            formWarnEl,
+            "프로필 이미지 업로드에 실패했습니다. 잠시 후 다시 시도해주세요.",
+            { type: "error" }
+          );
+          return;
+        }
+      }
+
+      // 3) 클라이언트 상태/스토리지 갱신
+      currentNickname = newNick;
+      localStorage.setItem("nickname", newNick);
+      pendingProfileFile = null;
+
+      clearProfileImageCache();
+      try {
+        const res2 = await getProfileInfo();
+        if (res2.ok) {
+          const body2 = await res2.json().catch(() => null);
+          const newUrl = body2?.data ?? null;
+          if (newUrl) {
+            currentProfileImageUrl = newUrl;
+            localStorage.setItem("profileImageUrl", newUrl);
+          }
+        }
+      } catch (e) {
+        console.error("[UserEdit] 프로필 이미지 재조회 실패", e);
+      }
+
+      renderMessage(
+        formWarnEl,
+        "회원정보가 수정되었습니다.",
+        { type: "success", autoHide: true }
+      );
+    } catch (err) {
+      console.error("[UserEdit] 회원정보 수정 중 오류", err);
+      renderMessage(
+        formWarnEl,
+        "회원정보 수정 중 오류가 발생했습니다.",
+        { type: "error" }
+      );
+    }
   });
 
-  logoutButton?.addEventListener('click', () => {
+  logoutButton?.addEventListener('click', async () => {
     renderMessage(formWarnEl, '', { autoHide: true });
 
-    // TODO: 로그아웃 API 호출
+    try {
+      const res = await logout();
+      if (!res.ok) {
+        console.error("[UserEdit] 로그아웃 실패", res.status);
+        // 실패해도 일단 클라이언트 쪽 상태는 정리하고 보냄
+      }
+    } catch (e) {
+      console.error("[UserEdit] 로그아웃 요청 중 오류", e);
+    }
+
+    // 클라이언트 상태 정리
+    localStorage.removeItem("userId");
+    localStorage.removeItem("email");
+    localStorage.removeItem("nickname");
+    // 필요한 키 더 있으면 여기서 같이 지우기
+
+    // 라우팅
+    if (window.router?.navigate) {
+      window.router.navigate("/login");
+    } else {
+      window.location.href = "/login";
+    }
   });
 }

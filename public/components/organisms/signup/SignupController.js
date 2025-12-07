@@ -3,6 +3,10 @@ import { registerEnterSubmit, useInput } from "../../../utils/commonHooks.js";
 import { validateAgreements, validateEmail, validateNickname, validatePassword, validateReInputPassword } from "../../../utils/validator.js";
 import { getPrivacyPolicy, getTerms, signup, uploadToS3 } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
+import { closeModal, openModal } from "../../molecules/modal/ModalController.js";
+
+let cachedTermsHtml = null;
+let cachedPrivacyHtml = null;
 
 export function initSignupPage() {
   const emailInput = useInput("signup-email");
@@ -27,7 +31,7 @@ export function initSignupPage() {
   const privacyContentEl = document.getElementById("privacy-content");
 
   configureHeader?.({
-    title: "아무 말 대잔치",
+    title: "Damul Board",
     showBack: false,
     showProfile: false,
   });
@@ -61,33 +65,94 @@ export function initSignupPage() {
   const openPrivacyBtn = document.getElementById('open-privacy');
 
   openTermsBtn?.addEventListener('click', async () => {
-    if (!termsContentEl) return;
-    
     try {
-      const res = await getTerms();
-      const html = await res.text();
-      termsContentEl.innerHTML = html;
-      termsContentEl.dataset.loaded = 'true';
-    } catch (e) {
-      termsContentEl.innerHTML = '<p>약관을 불러오는 중 오류가 발생했습니다.</p>';
-    }
+      if (!cachedTermsHtml) {
+        const res = await getTerms();
+        const html = await res.text();
 
-    termsContentEl.hidden = !termsContentEl.hidden;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const body = doc.body;
+
+        // body 안쪽만 사용 (head/style/doctype 버림)
+        cachedTermsHtml = body.innerHTML;
+      }
+
+      openModal({
+        title: '이용약관',
+        html: `
+          <div class="terms-modal-body">
+            <div class="terms-modal-body-inner">
+              ${cachedTermsHtml}
+            </div>
+          </div>
+        `,
+        actions: [
+          {
+            label: '닫기',
+            variant: 'dm-btn-primary',
+            onClick: () => closeModal(),
+          },
+        ],
+      });
+    } catch (e) {
+      openModal({
+        title: '이용약관',
+        message: '약관을 불러오는 중 오류가 발생했습니다.',
+        actions: [
+          {
+            label: '닫기',
+            variant: 'dm-btn-primary',
+            onClick: () => closeModal(),
+          },
+        ],
+      });
+    }
   });
 
   openPrivacyBtn?.addEventListener('click', async () => {
-    if (!privacyContentEl) return;
-    
     try {
-      const res = await getPrivacyPolicy();
-      const html = await res.text();
-      privacyContentEl.innerHTML = html;
-      privacyContentEl.dataset.loaded = 'true';
+      if (!cachedPrivacyHtml) {
+        const res = await getPrivacyPolicy();
+        const html = await res.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const body = doc.body;
+
+        cachedPrivacyHtml = body.innerHTML;
+      }
+
+      openModal({
+        title: '개인정보 처리방침',
+        html: `
+          <div class="terms-modal-body">
+            <div class="terms-modal-body-inner">
+              ${cachedPrivacyHtml}
+            </div>
+          </div>
+        `,
+        actions: [
+          {
+            label: '닫기',
+            variant: 'dm-btn-primary',
+            onClick: () => closeModal(),
+          },
+        ],
+      });
     } catch (e) {
-      privacyContentEl.innerHTML = '<p>개인정보처리방침을 불러오는 중 오류가 발생했습니다.</p>';
+      openModal({
+        title: '개인정보 처리방침',
+        message: '개인정보 처리방침을 불러오는 중 오류가 발생했습니다.',
+        actions: [
+          {
+            label: '닫기',
+            variant: 'dm-btn-primary',
+            onClick: () => closeModal(),
+          },
+        ],
+      });
     }
-    
-    privacyContentEl.hidden = !privacyContentEl.hidden;
   });
 
   signupBtn?.addEventListener('click', async () => {
@@ -109,7 +174,7 @@ export function initSignupPage() {
     const nickname = nicknameInput.value();
     
     const file = profileInput?.files?.[0] || null;
-    const fileName = file ? file.name : '';
+    const fileName = file ? file.name : null;
 
     try {
       const signupRes = await signup({

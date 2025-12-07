@@ -11,6 +11,12 @@ export function PostDetailPageView() {
           제목 로딩 중...
         </h1>
 
+        <!-- ★ 전역 에러 메시지 영역 -->
+        <div
+          id="post-detail-error"
+          class="post-detail-error text-danger small mt-2"
+        ></div>
+
         <div class="post-detail-meta user_info">
           <div class="post-detail-author">
             <img

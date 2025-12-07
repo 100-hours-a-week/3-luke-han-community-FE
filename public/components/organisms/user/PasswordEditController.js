@@ -1,11 +1,12 @@
 import { renderMessage } from "../../../utils/alerts.js";
 import { registerEnterSubmit } from "../../../utils/commonHooks.js";
 import { validatePassword, validateReInputPassword, validateRequired } from "../../../utils/validator.js";
+import { updateUserPassword } from "../../common/api.js";
 import { configureHeader } from "../../molecules/header/header.js";
 
 export function initPasswordEditPage() {
   configureHeader?.({
-    title: "아무 말 대잔치",
+    title: "Damul Board",
     showBack: true,
     showProfile: true,
   });
@@ -64,7 +65,46 @@ export function initPasswordEditPage() {
       return;
     }
 
-    // TODO: 비밀번호 변경 API 호출
+    try {
+      const userId = Number(localStorage.getItem("userId") || 0);
+
+      const body = {
+        userId,
+        oldPassword: currentPwInput.value,
+        newPassword: newPwInput.value,
+      };
+
+      const res = await updateUserPassword(body);
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => null);
+        const message =
+          errorBody?.message || '비밀번호 변경에 실패했습니다. 다시 시도해주세요.';
+
+        renderMessage(formWarnEl, message, { type: 'error' });
+        return;
+      }
+
+      renderMessage(formWarnEl, '비밀번호가 성공적으로 변경되었습니다.', {
+        type: 'success',
+      });
+
+      setTimeout(() => {
+        if (window.router?.navigate) {
+          window.router.navigate('/mypage');
+        } else {
+          window.location.href = '/mypage';
+        }
+      }, 800);
+
+    } catch (e) {
+      console.error('[PasswordEdit] 비밀번호 변경 요청 실패', e);
+      renderMessage(
+        formWarnEl,
+        '일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        { type: 'error' }
+      );
+    }
   });
 
   registerEnterSubmit(currentPwInput, () => submitBtn?.click());

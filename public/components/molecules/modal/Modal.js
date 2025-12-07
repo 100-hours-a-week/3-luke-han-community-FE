@@ -5,7 +5,7 @@ export function Modal() {
 
       <div class="dm-modal-sheet">
         <h2 id="dm-modal-title" class="dm-modal-title"></h2>
-        <p id="dm-modal-text" class="dm-modal-text"></p>
+        <div id="dm-modal-text" class="dm-modal-text"></div>
 
         <div id="dm-modal-actions" class="dm-modal-actions"></div>
       </div>
