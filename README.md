@@ -10,7 +10,7 @@
 ## 🥬 서비스 소개
 ### 가볍게 소통하는 창구 목적의 커뮤니티 프로젝트입니다.
 
-- 🕜 **진행 기간** : 2025.09.10. ~ 2025.07.31. (8주)
+- 🕜 **진행 기간** : 2025.09.10. ~ 2025.12.7.
 - 👨‍👩‍👧‍👦 **진행 인원** : 1명
 
 <br>
@@ -44,9 +44,7 @@
 |프로필 수정|비밀번호 수정|
 |---|---|
 |![image](./public/assets/image/readme/mypage.png)|![image](./public/assets/image/readme/password.png)|
-<br/>
-
-<br><br>
+<br/><br/>
 
 ## 🥬 팀원 소개
 <table>
@@ -79,13 +77,9 @@
 
 ## 🥬 시스템 아키텍처
 
+<img src="./public/assets/image/readme/damul_board_architecture.png"/>
+
 <br><br>
 
 ### 시연 영상
 [![Youtube Badge](https://img.shields.io/badge/Youtube-ff0000?style=flat-square&logo=youtube)](https://youtu.be/foXF3dAmswU)
-
-<br>
-
-### ERD
-
-<br><br>
