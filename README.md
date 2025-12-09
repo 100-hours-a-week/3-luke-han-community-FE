@@ -13,6 +13,8 @@
 - 🕜 **진행 기간** : 2025.09.10. ~ 2025.12.7.
 - 👨‍👩‍👧‍👦 **진행 인원** : 1명
 
+| <a href="https://github.com/100-hours-a-week/3-luke-han-community-BE">Backend-Repository</a>
+
 <br>
 
 ## 서비스 화면
@@ -61,7 +63,7 @@
 <tr>
     <td align="center">프론트엔드</td>
     <td>
-      <img src="https://img.shields.io/badge/logo-javascript-blue?logo=javascript"/>
+      <img src="https://img.shields.io/badge/javascript-yellow?style=flat&logo=javascript&logoColor=white"/>
     </td>
   </tr>
   <tr>
