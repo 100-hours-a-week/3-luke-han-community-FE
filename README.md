@@ -63,7 +63,7 @@
 <tr>
     <td align="center">프론트엔드</td>
     <td>
-      <img src="https://img.shields.io/badge/logo-javascript-blue?logo=javascript"/>
+      <img src="https://img.shields.io/badge/javascript-yellow?style=flat&logo=javascript&logoColor=white"/>
     </td>
   </tr>
   <tr>
