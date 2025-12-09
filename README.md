@@ -13,6 +13,8 @@
 - 🕜 **진행 기간** : 2025.09.10. ~ 2025.12.7.
 - 👨‍👩‍👧‍👦 **진행 인원** : 1명
 
+| <a href="https://github.com/100-hours-a-week/3-luke-han-community-BE">Backend-Repository</a>
+
 <br>
 
 ## 서비스 화면
